@@ -32,6 +32,7 @@
     "little-state-machine": "^4.7.0",
     "lodash": "^4.17.21",
     "moralis": "^2.13.0",
+    "multiselect-react-dropdown": "^2.0.25",
     "next": "12.3.1",
     "next-auth": "^4.19.2",
     "next-pwa": "^5.6.0",
