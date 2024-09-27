@@ -4,64 +4,70 @@
       "id": 0,
       "name": "ApeFans# 52",
       "owner": "Bored Ape Frens",
-      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png",
-      "price": 0.018,
-      "currency": "ETH"
+      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png"
     },
     {
       "id": 1,
       "name": "ApeFans# 52",
       "owner": "Bored Ape Frens",
-      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png",
-      "price": 0.018,
-      "currency": "ETH"
+      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png"
     },
     {
       "id": 2,
       "name": "ApeFans# 52",
       "owner": "Bored Ape Frens",
-      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png",
-      "price": 0.018,
-      "currency": "ETH"
+      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png"
     },
     {
       "id": 3,
       "name": "ApeFans# 52",
       "owner": "Bored Ape Frens",
-      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png",
-      "price": 0.018,
-      "currency": "ETH"
+      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png"
     },
     {
       "id": 4,
       "name": "ApeFans# 52",
       "owner": "Bored Ape Frens",
-      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png",
-      "price": 0.018,
-      "currency": "ETH"
+      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png"
     },
     {
       "id": 5,
       "name": "ApeFans# 52",
       "owner": "Bored Ape Frens",
-      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png",
-      "price": 0.018,
-      "currency": "ETH"
+      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png"
     },
     {
       "id": 6,
       "name": "ApeFans# 52",
       "owner": "Bored Ape Frens",
-      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png",
-      "price": 0.018,
-      "currency": "ETH"
+      "img": "https://cdn-icons-png.flaticon.com/512/6009/6009701.png"
     }
   ],
   "totalNFTs": 784847653,
   "sortOptions": [
-    {"id": 0, "name": "Low to High", "value": "Low to High", "group": "price"},
-    {"id": 1, "name": "High to Low", "value": "High to Low", "group": "price"},
-    {"id": 2, "name": "Low to High", "value": "Low to High", "group": "rarity"},
-    {"id": 3, "name": "High to Low", "value": "High to Low", "group": "rarity"}
+    {
+      "id": 0,
+      "name": "Low to High",
+      "value": "Low to High",
+      "group": "price"
+    },
+    {
+      "id": 1,
+      "name": "High to Low",
+      "value": "High to Low",
+      "group": "price"
+    },
+    {
+      "id": 2,
+      "name": "Low to High",
+      "value": "Low to High",
+      "group": "rarity"
+    },
+    {
+      "id": 3,
+      "name": "High to Low",
+      "value": "High to Low",
+      "group": "rarity"
+    }
   ]
 }
