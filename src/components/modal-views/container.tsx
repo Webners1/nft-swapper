@@ -8,6 +8,7 @@ import Button from '@/components/ui/button';
 import { Close } from '@/components/icons/close';
 import { useModal, MODAL_VIEW } from '@/components/modal-views/context';
 import ChangePriceView from '../marketplace/change-price';
+import BidValue from '../marketplace/bidValue';
 // dynamic imports
 const SearchView = dynamic(() => import('@/components/search/view'));
 const SelectWallet = dynamic(() => import('@/components/nft/select-wallet'));
@@ -22,6 +23,9 @@ const renderModalContent = (view: MODAL_VIEW | string) => {
       return <ChangePriceView nftStatus="ON_SALE" />;
     case 'SET_NEW_PRICE':
       return <ChangePriceView nftStatus="READY_FOR_SALE" />;
+      case 'BID_VALUE':
+  return <BidValue nftStatus="READY_FOR_SALE" />;
+
     default:
       return null;
   }

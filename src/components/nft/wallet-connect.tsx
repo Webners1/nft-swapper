@@ -6,10 +6,46 @@ import { Transition } from '@/components/ui/transition';
 import { PowerIcon } from '@/components/icons/power';
 import { useModal } from '@/components/modal-views/context';
 import { useContext } from 'react';
+import { Network, Alchemy } from 'alchemy-sdk';
+import { useEffect } from 'react';
 
 export const WalletConnect = ({ btnClassName }: { btnClassName?: string }) => {
   const { openModal } = useModal();
   const { address, disconnectWallet, balance } = useContext(WalletContext);
+
+
+
+  const fetchNftsByOwner = async (address, apiKey) => {
+    const url = `https://restapi.nftscan.com/api/v2/account/own/all/${address}?chain=scroll_mainnet&erc_type=erc721,erc1155&show_attribute=false`;
+  
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': apiKey,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error fetching NFTs: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      console.log('NFTs owned by address on Scroll mainnet:', data);
+      return data;
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
+// Example usage
+      const apiKey = ' api key'; // Replace with your actual API key
+      fetchNftsByOwner('0x76151eb2cc64df8f51550b5341ddcedf4be8676a', apiKey);
+
+  
+  
+ 
+
   return (
     <>
       {address ? (

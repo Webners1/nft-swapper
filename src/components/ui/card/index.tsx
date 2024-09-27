@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { FC } from 'react';
 import Button from '../button/button';
 
-type CardType = 'SELL' | 'BUY' | 'CHANGE_PRICE';
+type CardType = 'SELL' | 'BUY' | 'CHANGE_PRICE' | 'BID_VALUE';
 
 interface CardProps {
   cn?: string;
@@ -12,10 +12,10 @@ interface CardProps {
   cardType?: CardType;
 }
 
-const Card: FC<CardProps> = ({ cn, card, cardType = 'buy' }) => {
+const Card: FC<CardProps> = ({ cn, card, cardType = 'BID_VALUE' }) => {
   const router = useRouter();
-  let btnText = '';
   const { openModal } = useModal();
+  let btnText = '';
   switch (cardType) {
     case 'SELL':
       btnText = 'Sell';
@@ -24,13 +24,22 @@ const Card: FC<CardProps> = ({ cn, card, cardType = 'buy' }) => {
       btnText = 'Change price';
       break;
     default:
-      btnText = 'Buy';
+    case 'BID_VALUE':
+      btnText = 'Bid';
       break;
   }
   const handleSubmit = (card: NFTDataType) => {
-    if (cardType === 'CHANGE_PRICE') openModal('CHANGE_PRICE', card);
-    else if (cardType === 'SELL') openModal('SET_NEW_PRICE', card);
+    console.log('Button clicked:', cardType); // Debug line
+    if (cardType === 'CHANGE_PRICE') {
+      openModal('CHANGE_PRICE', card);
+    } else if (cardType === 'BID_VALUE') {
+      console.log('Opening BID_VALUE modal'); // Debug line
+      openModal('BID_VALUE', card);
+    } else if (cardType === 'SELL') {
+      openModal('SET_NEW_PRICE', card);
+    }
   };
+  
   const showDetail = () => {
     router.push(`/marketplace/${card.id}`);
   };
