@@ -45,8 +45,8 @@ export const useERC721Contract = (provider: Web3Provider | undefined) => {
       return _tokenSymbol;
     } catch (error) {
       console.log(error, 'Catch error Account is not connected');
-      setTokenSymbol('BUNZZ');
-      return 'BUNZZ';
+      setTokenSymbol('NFTSW');
+      return 'NFTSW';
     }
   };
 
@@ -57,8 +57,8 @@ export const useERC721Contract = (provider: Web3Provider | undefined) => {
       return _tokenSymbol;
     } catch (error) {
       console.log(error, 'Catch error Account is not connected');
-      setTokenSymbol('BUNZZ');
-      return 'BUNZZ';
+      setTokenSymbol('NFTSW');
+      return 'NFTSW';
     }
   };
 

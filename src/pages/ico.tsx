@@ -7,7 +7,7 @@ const ICOPage: NextPageWithLayout = () => {
   // render default create NFT component
   return (
     <>
-      <NextSeo title="ICO" description="Bunzz - ICO Boilerplate" />
+      <NextSeo title="ICO" description="NFTSW - ICO Boilerplate" />
       <ICO />
     </>
   );

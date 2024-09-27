@@ -4,6 +4,9 @@ import Head from 'next/head';
 import { ThemeProvider } from 'next-themes';
 import { DrawersContainer } from '@/components/drawer-views/container';
 import { ToastContainer } from 'react-toastify';
+import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
+import Tailwind from 'primereact/passthrough/tailwind';
+import './flags.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { WalletProvider } from '@/lib/hooks/use-connect';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
@@ -33,7 +36,7 @@ const CustomApp: FC<AppProps> = ({
           name="viewport"
           content="width=device-width, initial-scale=1 maximum-scale=1"
         />
-        <title>Bunzz - ICO & Staking boilerplate</title>
+        <title>NFTSW</title>
         <link
           href="https://fonts.googleapis.com/css?family=Manrope"
           rel="stylesheet"
@@ -46,11 +49,13 @@ const CustomApp: FC<AppProps> = ({
       >
         <ToastContainer />
         <WalletProvider>
-          {getLayout(<Component {...pageProps} />)}
-          {/*<SettingsButton />*/}
-          {/*<SettingsDrawer />*/}
-          <ModalContainer />
-          <DrawersContainer />
+          <PrimeReactProvider value={{ unstyled: true, pt: Tailwind }}>
+            {getLayout(<Component {...pageProps} />)}
+            {/*<SettingsButton />*/}
+            {/*<SettingsDrawer />*/}
+            <ModalContainer />
+            <DrawersContainer />
+          </PrimeReactProvider>
         </WalletProvider>
       </ThemeProvider>
     </>

@@ -4,7 +4,7 @@ import Image from '@/components/ui/image';
 import Button from '@/components/ui/button';
 import Input from '@/components/ui/forms/input';
 import InputLabel from '@/components/ui/input-label';
-import Image1 from '@/assets/images/bunzz/1.png';
+import Image1 from '@/assets/images/NFTSW/1.png';
 import { useICOContract } from '@/lib/hooks/use-ico-contract';
 import { useContext } from 'react';
 import { WalletContext } from '@/lib/hooks/use-connect';
@@ -49,7 +49,7 @@ export const ICO = () => {
 
   return (
     <>
-      <NextSeo title="ICO" description="Bunzz - ICO Boilerplate" />
+      <NextSeo title="ICO" description="NFTSW - ICO Boilerplate" />
       <div className="mx-auto w-full sm:pt-0 2xl:px-0">
         <div className="mb-8 grid grid-cols-1 md:grid-cols-2">
           <div className="flex-col lg:flex">

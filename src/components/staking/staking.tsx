@@ -5,7 +5,7 @@ import Button from '@/components/ui/button';
 import Input from '@/components/ui/forms/input';
 import InputLabel from '@/components/ui/input-label';
 //images
-import Image1 from '@/assets/images/bunzz/Group 13231.png';
+import Image1 from '@/assets/images/NFTSW/Group 13231.png';
 import { WalletContext } from '@/lib/hooks/use-connect';
 import { useERC20Contract } from '@/lib/hooks/use-erc20-contract';
 import { useStakingContract } from '@/lib/hooks/use-staking-contract';
@@ -86,7 +86,7 @@ export const Staking = () => {
 
   return (
     <>
-      <NextSeo title="Staking" description="Bunzz - Staking Boilerplate" />
+      <NextSeo title="Staking" description="NFTSW - Staking Boilerplate" />
       <div className="mx-auto w-full sm:pt-0 lg:px-8 xl:px-10 2xl:px-0">
         <div className="flex-col lg:flex">
           <div className="flex-col overflow-hidden rounded-lg bg-white shadow-card duration-200 dark:bg-light-dark">
@@ -140,7 +140,7 @@ export const Staking = () => {
                     </div>
                     <div className="">
                       Along with earning from 10.0 million in $BUNZ reward
-                      pools, staking also gives you voting rights on Bunzz DAO
+                      pools, staking also gives you voting rights on NFTSW DAO
                       proposals.
                     </div>
                   </div>

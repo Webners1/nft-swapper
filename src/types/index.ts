@@ -27,6 +27,4 @@ export interface NFTDataType {
   img: string;
   name: string;
   owner: string;
-  price: number;
-  currency: string;
 }

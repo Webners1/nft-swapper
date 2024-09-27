@@ -1,6 +1,7 @@
 import BoxArrowUpRightIcon from '@/components/icons/box-arrow-up-right';
 import ReloadIcon from '@/components/icons/reload';
 import ShareIcon from '@/components/icons/share';
+import { MultiSelect } from 'primereact/multiselect';
 import ThreeDotsIcon from '@/components/icons/threedots';
 import Button from '@/components/ui/button/button';
 import MinimalLayout from '@/layouts/_minimal';
@@ -10,6 +11,7 @@ import { NextSeo } from 'next-seo';
 import { ParsedUrlQuery } from 'querystring';
 import { useState } from 'react';
 import demoData from '../../data/demo.json';
+import { useModal } from '@/components/modal-views/context';
 
 interface IParams extends ParsedUrlQuery {
   id: string;
@@ -58,9 +60,21 @@ const NFTDetailPage: NextPageWithLayout = ({ data }) => {
     { name: 'Property', value: 'Crafted', trait: '66% have this trait' },
     { name: 'Type', value: 'Footwear', trait: '66% have this trait' },
   ];
+  const { openModal } = useModal();
+
+  const card: NFTDataType = {
+    id: 1,
+    img: 'https://example.com/images/nft1.png',
+    name: 'Galactic Dream',
+    owner: 'Alice123',
+  };
+
+  const handleSubmit = (card: NFTDataType) => {
+    openModal('BID_VALUE', card);
+  };
   return (
     <>
-      <NextSeo title="STAKING" description="Bunzz - Staking Boilerplate" />
+      <NextSeo title="STAKING" description="NFTSW - Staking Boilerplate" />
       <div className="flex w-full flex-col gap-y-5 gap-x-10 px-5 xs:flex-row xs:gap-y-0 2xl:px-56">
         <div className="flex w-full flex-col gap-y-4">
           <div className="flex w-full gap-x-5">
@@ -93,10 +107,11 @@ const NFTDetailPage: NextPageWithLayout = ({ data }) => {
             <span className="text-base text-gray-400">$100.05</span>
           </h1>
           <Button
+            className="mt-5"
+            size="block"
+            color="primary"
             shape="rounded"
-            variant="solid"
-            size="small"
-            className="w-[150px]"
+            onClick={() => handleSubmit(card)}
           >
             Buy
           </Button>

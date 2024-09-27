@@ -18,8 +18,8 @@ const ChangePriceView: FC<ChangePriceViewProps> = ({ nftStatus }) => {
   let btnTxt = 'Change';
   switch (nftStatus) {
     case 'READY_FOR_SALE':
-      headerTxt = 'Set new price';
-      btnTxt = 'Save';
+      headerTxt = '🖼️ Auction Your NFT';
+      btnTxt = 'Approve';
       break;
     default:
       break;
@@ -43,16 +43,8 @@ const ChangePriceView: FC<ChangePriceViewProps> = ({ nftStatus }) => {
           </Button>
         </div>
 
-        <InputLabel title="Price" />
-        <Input
-          defaultValue={card.price}
-          onChange={(e) => setCard({ ...card, price: Number(e.target.value) })}
-          min={0}
-          pattern="[+-]?([0-9]*[.])?[0-9]+"
-          type="text"
-          placeholder="Enter the amount of token to buy"
-          inputClassName="spin-button-hidden"
-        />
+        <h5>{ `See What Others Have to Offer! 🔥💎`}</h5>
+
         <Button
           className="mt-4"
           variant="solid"

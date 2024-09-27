@@ -2,6 +2,7 @@ import { useEffect, useState, createContext, ReactNode } from 'react';
 import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
+import { NFTDataType } from '@/types';
 
 const web3modalStorageKey = 'WEB3_CONNECT_CACHED_PROVIDER';
 
@@ -10,13 +11,19 @@ export const WalletContext = createContext<any>({});
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [balance, setBalance] = useState<string | undefined>(undefined);
+  const [UserNfts, setUserNfts] = useState<
+    NFTDataType[] | NFTDataType | undefined>(
+    undefined
+  );
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+  const apiKey = '68JvmwmnZk2qDYdyPENtpGPh'; // Replace with your actual API key
   const web3Modal =
     typeof window !== 'undefined' && new Web3Modal({ cacheProvider: true });
 
   /* This effect will fetch wallet address if user has already connected his/her wallet */
   useEffect(() => {
+
     async function checkConnection() {
       try {
         if (window && window.ethereum) {
@@ -34,13 +41,64 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     checkConnection().then();
   }, []);
 
+
+  const fetchNftsByOwner = async (
+    address: string,
+    apiKey: string
+  ): Promise<NFTDataType[] | undefined> => {
+    const url = `https://restapi.nftscan.com/api/v2/account/own/all/${address}?chain=scroll_mainnet&erc_type=erc721,erc1155&show_attribute=false`;
+  
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': apiKey,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error fetching NFTs: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+  
+      // Transforming the data into the NFTDataType format
+      const nftData: NFTDataType[] = data.data.flatMap((item: any) => 
+        item.assets.map((asset: any) => ({
+          id: parseInt(asset.token_id, 10), // Using the token ID as the unique identifier
+          img: asset.image_uri || asset.token_uri, // Choosing image URI or token URI
+          name: asset.name || 'Unnamed NFT', // Fallback name
+          owner: asset.owner || null, // Owner can be null
+        }))
+      );
+      console.log('NFTs owned by address on Scroll mainnet:', nftData);
+  
+      return nftData;
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
+
+  // Example usage
+
   const setWalletAddress = async (provider: Web3Provider) => {
     try {
+      console.log("wallet")
       const signer = provider.getSigner();
       if (signer) {
         const web3Address = await signer.getAddress();
         setAddress(web3Address);
         getBalance(provider, web3Address);
+        if(web3Address){
+          setUserNfts(
+            await fetchNftsByOwner(
+            '0x76151eb2cc64df8f51550b5341ddcedf4be8676a',
+              apiKey
+            )
+          )
+          console.log({UserNfts})
+        }
       }
     } catch (error) {
       console.log(
@@ -122,6 +180,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       value={{
         address,
         balance,
+        UserNfts,
         loading,
         error,
         connectToWallet,
@@ -134,3 +193,5 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     </WalletContext.Provider>
   );
 };
+
+

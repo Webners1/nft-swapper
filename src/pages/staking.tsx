@@ -7,7 +7,7 @@ const StakingPage: NextPageWithLayout = () => {
   // render default create NFT component
   return (
     <>
-      <NextSeo title="STAKING" description="Bunzz - Staking Boilerplate" />
+      <NextSeo title="STAKING" description="NFTSW - Staking Boilerplate" />
       <Staking />
     </>
   );

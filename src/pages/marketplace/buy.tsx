@@ -5,7 +5,7 @@ import Button from '@/components/ui/button/button';
 import Card from '@/components/ui/card';
 import { NextPageWithLayout, NFTDataType } from '@/types';
 import demoData from '../../data/demo.json';
-import useLoading from '@/lib/hooks/use-loading';
+import useLoading from '@/lib/hooks/use-loading';      
 import FullPageLoading from '@/components/ui/loading/full-page-loading';
 import MarketPlaceLayout from '@/layouts/maketplace/layout';
 
@@ -54,8 +54,8 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
   return (
     <>
       <NextSeo
-        title="Bunzz - Marketplace"
-        description="Bunzz Marketplace Buy"
+        title="NFTSW - Marketplace"
+        description="NFTSW Marketplace Buy"
       />
       <div className={`my-10 grid custom-grid-cols-${numPerRow} gap-4 py-10`}>
         {items.map((card, cardIdx) => {

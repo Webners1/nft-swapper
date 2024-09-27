@@ -9,16 +9,16 @@ interface MoralisAPIPayload {
   address: string;
 }
 
-const useMoralis = (option: MoralisAPIPayload) => {
-  const fetchNFTs = async () => {
-    const res = await Moralis.EvmApi.nft.getContractNFTs({
-      address: option.address,
-      chain: option.chain,
-    });
-    return res;
-  };
+// const useMoralis = (option: MoralisAPIPayload) => {
+//   const fetchNFTs = async () => {
+//     const res = await Moralis.EvmApi.nft.getContractNFTs({
+//       address: option.address,
+//       chain: option.chain,
+//     });
+//     return res;
+//   };
 
-  return [fetchNFTs];
-};
+//   return [fetchNFTs];
+// };
 
-export default useMoralis;
+// export default useMoralis;

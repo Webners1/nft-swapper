@@ -2,11 +2,10 @@ import type { NextPageWithLayout } from '@/types';
 import { NextSeo } from 'next-seo';
 import { ICO } from '@/components/ico/ico';
 import MinimalLayout from '@/layouts/_minimal';
-
 const ICOPage: NextPageWithLayout = () => {
   return (
     <>
-      <NextSeo title="ICO" description="Bunzz - ICO Boilerplate" />
+      <NextSeo title="ICO" description="NFTSW - ICO Boilerplate" />
       <ICO />
     </>
   );

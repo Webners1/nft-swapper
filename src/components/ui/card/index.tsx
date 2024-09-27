@@ -21,17 +21,16 @@ const Card: FC<CardProps> = ({ cn, card, cardType = 'BID_VALUE' }) => {
       btnText = 'Sell';
       break;
     case 'CHANGE_PRICE':
-      btnText = 'Change price';
+      btnText = 'See offers';
       break;
     default:
     case 'BID_VALUE':
-      btnText = 'Bid';
+      btnText = 'Make an Offer';
       break;
   }
   const handleSubmit = (card: NFTDataType) => {
     console.log('Button clicked:', cardType); // Debug line
     if (cardType === 'CHANGE_PRICE') {
-      openModal('CHANGE_PRICE', card);
     } else if (cardType === 'BID_VALUE') {
       console.log('Opening BID_VALUE modal'); // Debug line
       openModal('BID_VALUE', card);
