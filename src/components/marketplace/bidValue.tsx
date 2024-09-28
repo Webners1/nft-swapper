@@ -5,8 +5,7 @@ import InputLabel from '../ui/input-label';
 import Input from '../ui/forms/input';
 import { FC, useState } from 'react';
 import { NFTDataType } from '@/types';
-// import Multiselect from 'multiselect-react-dropdown';
-import { MultiSelect } from 'primereact/multiselect';
+import Multiselect from 'multiselect-react-dropdown';
 
 type NFT_STATUS = 'ON_SALE' | 'READY_FOR_SALE';
 interface BidValueViewProps {
@@ -16,6 +15,36 @@ interface BidValueViewProps {
 const BidValue: FC<BidValueViewProps> = ({ nftStatus }) => {
   const { closeModal, data } = useModal();
   const [card, setCard] = useState<NFTDataType>(data);
+  const [userNfts, setUserNfts] = useState<NFTDataType>([
+    {
+      cat: 'Group 1',
+      key: 'Option 1',
+    },
+    {
+      cat: 'Group 1',
+      key: 'Option 2',
+    },
+    {
+      cat: 'Group 1',
+      key: 'Option 3',
+    },
+    {
+      cat: 'Group 2',
+      key: 'Option 4',
+    },
+    {
+      cat: 'Group 2',
+      key: 'Option 5',
+    },
+    {
+      cat: 'Group 2',
+      key: 'Option 6',
+    },
+    {
+      cat: 'Group 2',
+      key: 'Option 7',
+    },
+  ]);
   let headerTxt = 'Bid Price';
   let btnTxt = 'Place Bid';
   switch (nftStatus) {
@@ -26,49 +55,6 @@ const BidValue: FC<BidValueViewProps> = ({ nftStatus }) => {
     default:
       break;
   }
-  const [selectedCountries, setSelectedCountries] = useState(null);
-  const countries = [
-    { name: 'Australia', code: 'AU' },
-    { name: 'Brazil', code: 'BR' },
-    { name: 'China', code: 'CN' },
-    { name: 'Egypt', code: 'EG' },
-    { name: 'France', code: 'FR' },
-    { name: 'Germany', code: 'DE' },
-    { name: 'India', code: 'IN' },
-    { name: 'Japan', code: 'JP' },
-    { name: 'Spain', code: 'ES' },
-    { name: 'United States', code: 'US' },
-  ];
-
-  const countryTemplate = (option) => {
-    return (
-      <div className="align-items-center flex">
-        <img
-          alt={option.name}
-          src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
-          className={`flag mr-2 flag-${option.code.toLowerCase()}`}
-          style={{ width: '18px' }}
-        />
-        <div>{option.name}</div>
-      </div>
-    );
-  };
-  const [selectedCities, setSelectedCities] = useState(null);
-  const cities = [
-    { name: 'New York', code: 'NY', image: '' },
-    { name: 'Rome', code: 'RM', image: '' },
-    { name: 'London', code: 'LDN', image: '' },
-    { name: 'Istanbul', code: 'IST', image: '' },
-    { name: 'Paris', code: 'PRS', image: '' },
-    { name: 'PariDSAs', code: 'PRRS', image: '' },
-    { name: 'ParSDSAis', code: 'PDRS', image: '' },
-    { name: 'ParSSAis', code: 'PSRS', image: '' },
-    { name: 'ParSDis', code: 'PRSS', image: '' },
-  ];
-  // const updatePrice = () => {
-  //   data.price = card.price;
-  //   closeModal();
-  // };
 
   return (
     <>
@@ -87,14 +73,13 @@ const BidValue: FC<BidValueViewProps> = ({ nftStatus }) => {
 
         <InputLabel title="Bid" />
 
-      
         <Multiselect
-          isObject={false}
+          displayValue="key"
           onKeyPressFn={function noRefCheck() {}}
           onRemove={function noRefCheck() {}}
           onSearch={function noRefCheck() {}}
           onSelect={function noRefCheck() {}}
-          options={['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5']}
+          options={userNfts}
         />
 
         <Button

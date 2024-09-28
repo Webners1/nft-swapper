@@ -78,7 +78,7 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
       />
       <div className={`my-10 grid custom-grid-cols-${numPerRow} gap-4 py-10`}>
         {items.map((nft, index) => (
-          <Link href={`/nft/${nft.id}`} passHref>
+          <Link href={`/marketplace/${nft.address}/${nft.id}`} passHref>
           <a>
           <React.Fragment key={`${nft.name}_${index}`}>
             <Card 

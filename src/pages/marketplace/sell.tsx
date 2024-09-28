@@ -14,7 +14,6 @@ const MarketPlaceSell: NextPageWithLayout = () => {
     address: ERC721TOKEN_ADDRESS,
   };
   const { UserNfts } = useContext(WalletContext);
-console.log(UserNfts)
   const [items] = useState<Array<NFTDataType>>(UserNfts);
   const [saleItems] = useState<Array<NFTDataType>>(
     UserNfts?.slice(0, 3) 
