@@ -50,13 +50,13 @@ const Card: FC<CardProps> = ({ cn, card, cardType = 'BID_VALUE' }) => {
         <div className="relative w-full">
           <img
             className="rounded-lg bg-gray-100 p-2"
-            src={card.img}
+            src={`https://ipfs.io/ipfs/${card.img}`}
             alt={card.name}
             onClick={() => showDetail()}
           />
         </div>
         <p className="mt-2 font-semibold text-gray-600">{card.name}</p>
-        <p className="text-gray-400">{card.owner}</p>
+        <p className="text-gray-400">{`${card.owner.slice(0,5)}.....${card.owner.slice(-6,-1)}`}</p>
         <p className="my-2 font-semibold text-gray-600">
           {card.price} {card.currency}
         </p>

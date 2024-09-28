@@ -14,7 +14,7 @@ export const fetchNftsByOwner = async (
   address: string,
   apiKey: string
 ): Promise<NFTDataType[] | undefined> => {
-  const url = `https://scrollapi.nftscan.com/api/v2/account/own/0x76151eb2cc64df8f51550b5341ddcedf4be8676a?erc_type=erc721&show_attribute=false&sort_field=&sort_direction=`;
+  const url = `https://scrollapi.nftscan.com/api/v2/account/own/0x76151eb2cc64df8f51550b5341ddcedf4be8676a?erc_type=erc721&show_attribute=true&sort_field=&sort_direction=`;
 
   try {
     const response = await fetch(url, {
@@ -29,6 +29,7 @@ export const fetchNftsByOwner = async (
     }
 
     const data = await response.json();
+    console.log(data.data)
     // Transforming the data into the NFTDataType format
     const nftData: NFTDataType[] = data.data.content.map((item: any) => {
       const asset = item; // Assuming 'item' contains the asset data
@@ -72,6 +73,7 @@ export const fetchNftsById = async (
     const data = await response.json();
     // Transforming the data into the NFTDataType format
     const asset = data.data;
+    console.log(asset)
     return {
       id: parseInt(asset.token_id, 10),
       img: asset.image_uri || asset.token_uri,
@@ -79,6 +81,7 @@ export const fetchNftsById = async (
       description: asset.description || 'No description available',
       owner: asset.owner || null,
       address: asset.contract_address || null,
+      properties: asset.attributes
     };
 
     // Console log the description and owner for each NFT

@@ -3,58 +3,35 @@ import { useModal } from '../modal-views/context';
 import Button from '../ui/button/button';
 import InputLabel from '../ui/input-label';
 import Input from '../ui/forms/input';
-import { FC, useState } from 'react';
+import { FC, useContext, useState } from 'react';
 import { NFTDataType } from '@/types';
 import Multiselect from 'multiselect-react-dropdown';
+import { WalletContext } from '@/lib/hooks/use-connect';
 
 type NFT_STATUS = 'ON_SALE' | 'READY_FOR_SALE';
 interface BidValueViewProps {
   nftStatus: NFT_STATUS;
 }
 
-const BidValue: FC<BidValueViewProps> = ({ nftStatus }) => {
+const BidValue: FC<BidValueViewProps> = () => {
   const { closeModal, data } = useModal();
   const [card, setCard] = useState<NFTDataType>(data);
-  const [userNfts, setUserNfts] = useState<NFTDataType>([
-    {
-      cat: 'Group 1',
-      key: 'Option 1',
-    },
-    {
-      cat: 'Group 1',
-      key: 'Option 2',
-    },
-    {
-      cat: 'Group 1',
-      key: 'Option 3',
-    },
-    {
-      cat: 'Group 2',
-      key: 'Option 4',
-    },
-    {
-      cat: 'Group 2',
-      key: 'Option 5',
-    },
-    {
-      cat: 'Group 2',
-      key: 'Option 6',
-    },
-    {
-      cat: 'Group 2',
-      key: 'Option 7',
-    },
-  ]);
-  let headerTxt = 'Bid Price';
-  let btnTxt = 'Place Bid';
-  switch (nftStatus) {
-    case 'READY_FOR_SALE':
-      headerTxt = 'Bid a price';
-      btnTxt = 'Place Bid';
-      break;
-    default:
-      break;
-  }
+  const [selectedNfts, setSelectedNfts] = useState<NFTDataType[] | null>();
+  const { UserNfts } = useContext(WalletContext);
+  
+  const headerTxt = 'Bid Price';
+  const btnTxt = 'Place Bid';
+  const handleSelect = (selectedList: NFTDataType[], selectedItem: NFTDataType) => {
+    setSelectedNfts(selectedList);
+ console.log({selectedNfts})
+
+  };
+
+  const handleRemove = (selectedList: NFTDataType[], selectedItem: NFTDataType) => {
+    setSelectedNfts(selectedList);
+ console.log({selectedNfts})
+
+  };
 
   return (
     <>
@@ -74,12 +51,12 @@ const BidValue: FC<BidValueViewProps> = ({ nftStatus }) => {
         <InputLabel title="Bid" />
 
         <Multiselect
-          displayValue="key"
+          displayValue="name"
           onKeyPressFn={function noRefCheck() {}}
-          onRemove={function noRefCheck() {}}
+          onRemove={handleRemove}
           onSearch={function noRefCheck() {}}
-          onSelect={function noRefCheck() {}}
-          options={userNfts}
+          onSelect={handleSelect}
+          options={UserNfts}
         />
 
         <Button
