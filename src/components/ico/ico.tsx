@@ -4,7 +4,7 @@ import Image from '@/components/ui/image';
 import Button from '@/components/ui/button';
 import Input from '@/components/ui/forms/input';
 import InputLabel from '@/components/ui/input-label';
-import Image1 from '@/assets/images/NFTSW/1.png';
+// import Image1 from '@/assets/images/NFTSW/1.png';
 import { useICOContract } from '@/lib/hooks/use-ico-contract';
 import { useContext } from 'react';
 import { WalletContext } from '@/lib/hooks/use-connect';

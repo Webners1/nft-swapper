@@ -160,20 +160,12 @@ const NFTDetailComponent: React.FC = () => {
   const apiKey = '68JvmwmnZk2qDYdyPENtpGPh';
   const address = '0x76151eb2cc64df8f51550b5341ddcedf4be8676a';
 
-  // Log router readiness and query for debugging
-  useEffect(() => {
-    if (router.isReady) {
-      console.log('Router is ready:', router.query);  // Debugging
-    }
-  }, [router.isReady]);
-
   useEffect(() => {
     const fetchNFTDetails = async () => {
-      if (router.isReady && id) {  // Ensure router is ready and id is available
-        console.log('Fetching for ID:', id); // Debugging
+      if (router.isReady && id) {
         try {
           const nfts = await fetchNftsByOwner(address, apiKey);
-          const selectedNFT = nfts.find(nft => nft.id === Number(id));
+          const selectedNFT = nfts.find(nft => nft.id.toString() === id); // Ensure type consistency
           if (selectedNFT) {
             setNFT(selectedNFT);
           } else {
@@ -188,7 +180,7 @@ const NFTDetailComponent: React.FC = () => {
     };
 
     fetchNFTDetails();
-  }, [router.isReady, id]);
+  }, [router.isReady, id, apiKey, address]); // Added dependencies for better performance
 
   if (isLoading) {
     return <FullPageLoading />;
