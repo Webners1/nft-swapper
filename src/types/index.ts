@@ -25,6 +25,7 @@ export interface NFTPropertyType {
 export interface NFTDataType {
   id: number;
   img: string;
+  address: string;
   name: string;
   owner: string;
 }

@@ -15,7 +15,7 @@ const MarketPlaceSell: NextPageWithLayout = () => {
   };
   const { UserNfts } = useContext(WalletContext);
 console.log(UserNfts)
-  const [items] = useState<Array<NFTDataType>>(UserNfts?.slice(0, 3));
+  const [items] = useState<Array<NFTDataType>>(UserNfts);
   const [saleItems] = useState<Array<NFTDataType>>(
     UserNfts?.slice(0, 3) 
   );

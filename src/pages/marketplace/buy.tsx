@@ -13,9 +13,10 @@ import { fetchNftsByOwner, WalletContext } from '@/lib/hooks/use-connect';
 const MarketPlaceBuy: NextPageWithLayout = () => {
   const [isLoading, showLoading, hideLoading] = useLoading();
   const [items, setItems] = useState<Array<NFTDataType>>([]);
+  const { apiKey } = useContext(WalletContext);
   const [numPerRow, setNumPerRow] = useState<number>(0);
   const router = useRouter();
-  const apiKey = '68JvmwmnZk2qDYdyPENtpGPh';
+
   const address = '0x76151eb2cc64df8f51550b5341ddcedf4be8676a';
 
   useEffect(() => {
@@ -66,7 +67,7 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
   }, []);
 
   const handleNFTClick = (nft: NFTDataType) => {
-    router.push(`/nft/${nft.id}`);
+    router.push(`/nft/${nft.address}${nft.id}`);
   };
 
   return (
@@ -82,6 +83,8 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
               card={{
                 img: nft.img,
                 name: nft.name,
+                id: nft.id,
+                address: nft.address,
                 owner: nft.owner,
               }} 
               onClick={() => handleNFTClick(nft)}
