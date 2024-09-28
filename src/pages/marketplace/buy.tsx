@@ -9,7 +9,7 @@ import useLoading from '@/lib/hooks/use-loading';
 import FullPageLoading from '@/components/ui/loading/full-page-loading';
 import MarketPlaceLayout from '@/layouts/maketplace/layout';
 import { fetchNftsByOwner, WalletContext } from '@/lib/hooks/use-connect';
-
+import Link from 'next/link';
 const MarketPlaceBuy: NextPageWithLayout = () => {
   const [isLoading, showLoading, hideLoading] = useLoading();
   const [items, setItems] = useState<Array<NFTDataType>>([]);
@@ -78,6 +78,8 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
       />
       <div className={`my-10 grid custom-grid-cols-${numPerRow} gap-4 py-10`}>
         {items.map((nft, index) => (
+          <Link href={`/nft/${nft.id}`} passHref>
+          <a>
           <React.Fragment key={`${nft.name}_${index}`}>
             <Card 
               card={{
@@ -90,6 +92,11 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
               onClick={() => handleNFTClick(nft)}
             />
           </React.Fragment>
+          </a>
+        </Link>
+        
+
+        
         ))}
       </div>
       <Button

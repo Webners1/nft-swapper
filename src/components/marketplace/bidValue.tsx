@@ -5,7 +5,7 @@ import InputLabel from '../ui/input-label';
 import Input from '../ui/forms/input';
 import { FC, useState } from 'react';
 import { NFTDataType } from '@/types';
-import Multiselect from 'multiselect-react-dropdown';
+// import Multiselect from 'multiselect-react-dropdown';
 import { MultiSelect } from 'primereact/multiselect';
 
 type NFT_STATUS = 'ON_SALE' | 'READY_FOR_SALE';

@@ -1,3 +1,87 @@
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { NextSeo } from 'next-seo';
+import { NFTDataType } from '@/types';
+import { fetchNftsByOwner } from '@/lib/hooks/use-connect';
+import FullPageLoading from '@/components/ui/loading/full-page-loading';
+import MarketPlaceLayout from '@/layouts/maketplace/layout';
+
+const NFTDetailComponent: React.FC = () => {
+  const router = useRouter();
+  const { id } = router.query;
+  const [nft, setNFT] = useState<NFTDataType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const apiKey = '68JvmwmnZk2qDYdyPENtpGPh';
+  const address = '0x76151eb2cc64df8f51550b5341ddcedf4be8676a';
+
+  useEffect(() => {
+    const fetchNFTDetails = async () => {
+      if (router.isReady && id) {
+        try {
+          const nfts = await fetchNftsByOwner(address, apiKey);
+          const selectedNFT = nfts.find(nft => nft.id.toString() === id); // Ensure type consistency
+          if (selectedNFT) {
+            setNFT(selectedNFT);
+          } else {
+            console.error('NFT not found');
+          }
+        } catch (error) {
+          console.error('Error fetching NFT details:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchNFTDetails();
+  }, [router.isReady, id, apiKey, address]); // Added dependencies for better performance
+
+  if (isLoading) {
+    return <FullPageLoading />;
+  }
+
+  if (!nft) {
+    return <div>NFT not found</div>;
+  }
+
+  return (
+    <>
+      <NextSeo
+        title={`NFTSW - ${nft.name}`}
+        description={`Details for NFT: ${nft.name}`}
+      />
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-4">{nft.name}</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <img src={nft.img} alt={nft.name} className="w-full rounded-lg shadow-lg" />
+          </div>
+          <div>
+            <p className="text-xl mb-2"><strong>Owner:</strong> {nft.owner}</p>
+            <p className="text-xl mb-2"><strong>ID:</strong> {nft.id}</p>
+            <p className="text-xl mb-4"><strong>Description:</strong> {nft.description}</p>
+            {/* Add more details as needed */}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+NFTDetailComponent.getLayout = function getLayout(page) {
+  return <MarketPlaceLayout>{page}</MarketPlaceLayout>;
+};
+
+export default NFTDetailComponent;
+
+
+
+
+
+
+
+
+
 // import BoxArrowUpRightIcon from '@/components/icons/box-arrow-up-right';
 // import ReloadIcon from '@/components/icons/reload';
 // import ShareIcon from '@/components/icons/share';
