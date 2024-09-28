@@ -5,6 +5,7 @@ import InputLabel from '../ui/input-label';
 import Input from '../ui/forms/input';
 import { FC, useState } from 'react';
 import { NFTDataType } from '@/types';
+import Multiselect from 'multiselect-react-dropdown';
 import { MultiSelect } from 'primereact/multiselect';
 
 type NFT_STATUS = 'ON_SALE' | 'READY_FOR_SALE';
@@ -54,15 +55,15 @@ const BidValue: FC<BidValueViewProps> = ({ nftStatus }) => {
   };
   const [selectedCities, setSelectedCities] = useState(null);
   const cities = [
-    { name: 'New York', code: 'NY' , image:""},
-    { name: 'Rome', code: 'RM' ,image:""},
-    { name: 'London', code: 'LDN' ,image:""},
-    { name: 'Istanbul', code: 'IST' ,image:""},
-    { name: 'Paris', code: 'PRS' ,image:""},
-    { name: 'PariDSAs', code: 'PRRS' ,image:""},
-    { name: 'ParSDSAis', code: 'PDRS' ,image:""},
-    { name: 'ParSSAis', code: 'PSRS' ,image:""},
-    { name: 'ParSDis', code: 'PRSS' ,image:""},
+    { name: 'New York', code: 'NY', image: '' },
+    { name: 'Rome', code: 'RM', image: '' },
+    { name: 'London', code: 'LDN', image: '' },
+    { name: 'Istanbul', code: 'IST', image: '' },
+    { name: 'Paris', code: 'PRS', image: '' },
+    { name: 'PariDSAs', code: 'PRRS', image: '' },
+    { name: 'ParSDSAis', code: 'PDRS', image: '' },
+    { name: 'ParSSAis', code: 'PSRS', image: '' },
+    { name: 'ParSDis', code: 'PRSS', image: '' },
   ];
   // const updatePrice = () => {
   //   data.price = card.price;
@@ -86,18 +87,15 @@ const BidValue: FC<BidValueViewProps> = ({ nftStatus }) => {
 
         <InputLabel title="Bid" />
 
-        <div className="card justify-content-center flex">
-          <MultiSelect
-            value={selectedCountries}
-            options={countries}
-            onChange={(e) => setSelectedCountries(e.value)}
-            optionLabel="name"
-            placeholder="Select Countries"
-            itemTemplate={countryTemplate}
-            className="p-multiselect"
-            display="chip"
-          />
-        </div>
+      
+        <Multiselect
+          isObject={false}
+          onKeyPressFn={function noRefCheck() {}}
+          onRemove={function noRefCheck() {}}
+          onSearch={function noRefCheck() {}}
+          onSelect={function noRefCheck() {}}
+          options={['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5']}
+        />
 
         <Button
           className="mt-4"
