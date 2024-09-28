@@ -1,28 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { NextSeo } from 'next-seo';
+import { useRouter } from 'next/router';
 import { breakPoints } from '@/lib/hooks/use-breakpoint';
 import Button from '@/components/ui/button/button';
 import Card from '@/components/ui/card';
 import { NextPageWithLayout, NFTDataType } from '@/types';
-import demoData from '../../data/demo.json';
 import useLoading from '@/lib/hooks/use-loading';      
 import FullPageLoading from '@/components/ui/loading/full-page-loading';
 import MarketPlaceLayout from '@/layouts/maketplace/layout';
+import { fetchNftsByOwner, WalletContext } from '@/lib/hooks/use-connect';
 
 const MarketPlaceBuy: NextPageWithLayout = () => {
   const [isLoading, showLoading, hideLoading] = useLoading();
-  const [items, setItems] = useState<Array<NFTDataType>>(
-    demoData.cardData.slice(0, 6)
-  );
+  const [items, setItems] = useState<Array<NFTDataType>>([]);
   const [numPerRow, setNumPerRow] = useState<number>(0);
-  const loadMore = () => {
-    showLoading();
-    setTimeout(() => {
-      const newItems = Array(numPerRow * 3).fill(demoData.cardData[0]);
-      setItems([...items, ...newItems]);
-      hideLoading();
-    }, 3000);
-  };
+  const router = useRouter();
+  const apiKey = '68JvmwmnZk2qDYdyPENtpGPh';
+  const address = '0x76151eb2cc64df8f51550b5341ddcedf4be8676a';
+
+  useEffect(() => {
+    const fetchNFTs = async () => {
+      if (address) {
+        showLoading();
+        try {
+          const nfts = await fetchNftsByOwner(address, apiKey);
+          if (nfts) {
+            setItems(nfts);
+          }
+        } catch (error) {
+          console.error('Error fetching NFTs:', error);
+        } finally {
+          hideLoading();
+        }
+      }
+    };
+
+    fetchNFTs();
+  }, [address]);
 
   useEffect(() => {
     const handleWindowResize = () => {
@@ -51,6 +65,10 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
     return () => window.removeEventListener('resize', handleWindowResize);
   }, []);
 
+  const handleNFTClick = (nft: NFTDataType) => {
+    router.push(`/nft/${nft.id}`);
+  };
+
   return (
     <>
       <NextSeo
@@ -58,19 +76,23 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
         description="NFTSW Marketplace Buy"
       />
       <div className={`my-10 grid custom-grid-cols-${numPerRow} gap-4 py-10`}>
-        {items.map((card, cardIdx) => {
-          return (
-            <React.Fragment key={`${card.name}_${cardIdx}`}>
-              <Card card={card} />
-            </React.Fragment>
-          );
-        })}
+        {items.map((nft, index) => (
+          <React.Fragment key={`${nft.name}_${index}`}>
+            <Card 
+              card={{
+                img: nft.img,
+                name: nft.name,
+                owner: nft.owner,
+              }} 
+              onClick={() => handleNFTClick(nft)}
+            />
+          </React.Fragment>
+        ))}
       </div>
       <Button
         color="primary"
         size="small"
         className="mx-auto"
-        onClick={() => loadMore()}
       >
         Load More
       </Button>
