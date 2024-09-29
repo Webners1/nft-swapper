@@ -5,6 +5,7 @@ import InputLabel from '../ui/input-label';
 import Input from '../ui/forms/input';
 import { FC, useContext, useState } from 'react';
 import { NFTDataType } from '@/types';
+import Multiselect from 'multiselect-react-dropdown';
 import { WalletContext } from '@/lib/hooks/use-connect';
 
 type NFT_STATUS = 'ON_SALE' | 'READY_FOR_SALE';
