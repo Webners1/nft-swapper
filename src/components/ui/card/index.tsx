@@ -40,7 +40,7 @@ const Card: FC<CardProps> = ({ cn, card, cardType = 'BID_VALUE' }) => {
   };
   
   const showDetail = () => {
-    router.push(`/marketplace/${card.address}/${card.id}`);
+    router.push(`/marketplace/${card.address}/${card.tokenId}/${card.id}`);
   };
   return (
     <>

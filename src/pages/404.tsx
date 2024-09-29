@@ -35,7 +35,7 @@ const ErrorPage: NextPageWithLayout = () => {
         </p>
         <AnchorLink
           href={{
-            pathname: routes.home,
+            pathname: routes.marketplace,
             ...(layout !== LAYOUT_OPTIONS.MODERN &&
               layout !== undefined && {
                 query: {

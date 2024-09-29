@@ -23,7 +23,8 @@ export interface NFTPropertyType {
   background: string;
 }
 export interface NFTDataType {
-  id: number;
+  id?: number;
+  tokenId: number;
   img: string;
   address: string;
   name: string;

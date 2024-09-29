@@ -36,7 +36,7 @@ const CustomApp: FC<AppProps> = ({
           name="viewport"
           content="width=device-width, initial-scale=1 maximum-scale=1"
         />
-        <title>NFTSW</title>
+        <title>NFTSwapper</title>
         <link
           href="https://fonts.googleapis.com/css?family=Manrope"
           rel="stylesheet"

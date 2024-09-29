@@ -1,8 +1,4 @@
-import DiscordIcon from '@/components/icons/discord';
-import OpenseaIcon from '@/components/icons/opensea';
-import TofuNftIcon from '@/components/icons/tofu-nft';
-import TwitterIcon from '@/components/icons/twitter';
-import Button from '@/components/ui/button/button';
+
 import { Fragment } from 'react';
 import FooterData from './data.json';
 
@@ -34,7 +30,7 @@ const Footer = () => {
               </h1>
               <h2 className=" text-lg">{FooterData.subtitle}</h2>
             </div>
-            {renderSocials()}
+          
           </div>
           <p className="text-sm">{FooterData.copyright}</p>
         </div>

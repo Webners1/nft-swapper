@@ -19,7 +19,8 @@ interface WalletContextType {
   error: boolean;
   getOffers: (orderId: number) => Promise<void>;
   getAllOrder: () => Promise<void>;
-  getAllOrders: () =>Promise<void>;
+  getAllOrders: () => Promise<void>;
+  userListedNfts: NFTDataType[] | NFTDataType | undefined;
   getOrder: (orderId: number) => Promise<void>;
   connectToWallet: () => Promise<void>;
   disconnectWallet: () => void;
@@ -64,7 +65,7 @@ export const fetchNftsByOwner = async (
     const nftData: NFTDataType[] = data.data.content.map((item: any) => {
       const asset = item; // Assuming 'item' contains the asset data
       return {
-        id: parseInt(asset.token_id, 10),
+        tokenId: parseInt(asset.token_id, 10),
         img: asset.image_uri || asset.token_uri,
         name: asset.name || 'Unnamed NFT',
         description: asset.description || 'No description available',
@@ -93,9 +94,10 @@ type Order = {
 
 export const fetchNftsById = async (
   contract_address: string,
-  id: string
+  tokenId: number,
+  id: number
 ): Promise<any | undefined> => {
-  const url = `https://scrollapi.nftscan.com/api/v2/assets/${contract_address}/${id}?show_attribute=true`;
+  const url = `https://scrollapi.nftscan.com/api/v2/assets/${contract_address}/${tokenId}?show_attribute=true`;
 
   try {
     const response = await fetch(url, {
@@ -114,7 +116,8 @@ export const fetchNftsById = async (
     const asset = data.data;
     console.log(asset);
     return {
-      id: parseInt(asset.token_id, 10),
+      tokenId: parseInt(asset.token_id, 10),
+      id: id,
       img: asset.image_uri || asset.token_uri,
       name: asset.name || 'Unnamed NFT',
       description: asset.description || 'No description available',
@@ -259,7 +262,6 @@ export const getAllOrder = async () => {
   }
 };
 
-
 export const getOrder = async (orderId: number) => {
   const { nftSwapperContract } = useWallet();
   try {
@@ -305,6 +307,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [UserNfts, setUserNfts] = useState<
     NFTDataType[] | NFTDataType | undefined
   >(undefined);
+
+  const [ActiveNftDetails, setActiveNftDetails] = useState<any>(undefined);
+  const [userListedNfts, setListedUserNfts] = useState<
+    NFTDataType[] | undefined
+  >(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [nftSwapperContract, setNftSwapperContract] =
@@ -320,6 +327,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           if (localStorage.getItem(web3modalStorageKey)) {
             await connectToWallet();
           }
+          if (ActiveNftDetails) {
+            getUserListed();
+          }
         } else {
           console.log('window or window.ethereum is not available');
         }
@@ -328,15 +338,14 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     checkConnection().then();
-  }, []);
-
+  }, [ActiveNftDetails]);
 
   const getAllOrders = async () => {
     try {
       // First, get the total number of orders
       // const totalOrders = await nftSwapperContract.getAllOrder();
       const totalOrders = 4; // For demo purposes
-      const activeNftDetails = {}; // Object to store active orders
+      const activeNftDetails = []; // Object to store active orders
 
       // Iterate through each order ID
       for (let i = 0; i < totalOrders; i++) {
@@ -380,12 +389,12 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         // Check if the order is active
         if (isActive) {
           // Store the active order in the object
-          const nftDetail = await fetchNftsById(nftAddress, nftId); // Pass the nftId directly
+          const nftDetail = await fetchNftsById(nftAddress, nftId, i); // Pass the nftId directly
           activeNftDetails[i] = nftDetail; // Store the NFT detail by order index
         }
       }
 
-      setNftDetails(activeNftDetails); // Update state with active orders
+      setActiveNftDetails(activeNftDetails); // Update state with active orders
     } catch (error) {
       console.log(error);
     }
@@ -496,6 +505,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     return new ethers.providers.JsonRpcProvider(ALCHEMY_RPC_URL);
   };
 
+  const getUserListed = () => {
+    setListedUserNfts(ActiveNftDetails.filter((nft) => nft.owner === address));
+    return userListedNfts;
+  };
+
   const getBalance = async (provider: Web3Provider, walletAddress: string) => {
     const walletBalance = await provider.getBalance(walletAddress);
     const balanceInEth = ethers.utils.formatEther(walletBalance);
@@ -565,6 +579,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         getProvider,
         getOffers,
         getAllOrder,
+        userListedNfts,
         getAllOrders,
         getOrder,
         getSigner,

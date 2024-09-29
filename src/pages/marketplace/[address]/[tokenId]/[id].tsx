@@ -68,12 +68,12 @@ const useOrderWithOffers = (orderId: number) => {
 const NFTDetailComponent: React.FC = () => {
   const router = useRouter();
   const { openModal, data } = useModal();
-
-  const { address, id } = router.query;
+  const { address: user } = useContext(WalletContext);
+  const { address, tokenId, id } = router.query;
   const { orderWithOffers, loading, error } = useOrderWithOffers(id);
   const demoOrderWithOffers: OrderWithOffers = {
     order: {
-      owner: '0x303963f2480d9995e5596658986dd2a0af9a28e5', // Address of the order creator (the NFT contract)
+      owner: user, // Address of the order creator (the NFT contract)
       nftAddress: '0x303963f2480d9995e5596658986dd2a0af9a28e5', // NFT contract address
       nftId: 1, // Sample NFT token ID
       isActive: true, // Status of the order
@@ -86,20 +86,27 @@ const NFTDetailComponent: React.FC = () => {
       },
       {
         proposer: '0xb1c2d3e4f5g67890abcdef1234567890abcdef34', // Another offer maker's address
-        nftOffered: ['0x303963f2480d9995e5596658986dd2a0af9a28e5','0x303963f2480d9995e5596658986dd2a0af9a28e5','0x303963f2480d9995e5596658986dd2a0af9a28e5','0x303963f2480d9995e5596658986dd2a0af9a28e5'], // Contract address of the NFT offered
-        offeredIds: [2058,1300,1034,1034], // Token IDs of the offered NFTs
+        nftOffered: [
+          '0x303963f2480d9995e5596658986dd2a0af9a28e5',
+          '0x303963f2480d9995e5596658986dd2a0af9a28e5',
+          '0x303963f2480d9995e5596658986dd2a0af9a28e5',
+          '0x303963f2480d9995e5596658986dd2a0af9a28e5',
+        ], // Contract address of the NFT offered
+        offeredIds: [2058, 1300, 1034, 1034], // Token IDs of the offered NFTs
       },
       {
         proposer: '0xc1d2e3f4g5h67890abcdef1234567890abcdef56', // Yet another offer maker's address
-        nftOffered: ['0x303963f2480d9995e5596658986dd2a0af9a28e5','0x303963f2480d9995e5596658986dd2a0af9a28e5'], // Contract address of the NFT offered
-        offeredIds: [1470,1350], // Token IDs of the offered NFTs
+        nftOffered: [
+          '0x303963f2480d9995e5596658986dd2a0af9a28e5',
+          '0x303963f2480d9995e5596658986dd2a0af9a28e5',
+        ], // Contract address of the NFT offered
+        offeredIds: [1470, 1350], // Token IDs of the offered NFTs
       },
     ],
   };
 
   const [nft, setNFT] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const user_address = '0x76151eb2cc64df8f51550b5341ddcedf4be8676a';
 
   // Log router readiness and query for debugging
   useEffect(() => {
@@ -110,13 +117,17 @@ const NFTDetailComponent: React.FC = () => {
 
   const btnText = 'Make an Offer';
 
-
   useEffect(() => {
     const fetchNFTDetails = async () => {
-      if (router.isReady && id && address) {
+      if (router.isReady && tokenId && address) {
         try {
-          console.log('Fetching NFT with ID:', id, ' and Address:', address); // Debugging
-          const nfts = await fetchNftsById(address, id);
+          console.log(
+            'Fetching NFT with ID:',
+            tokenId,
+            ' and Address:',
+            address
+          ); // Debugging
+          const nfts = await fetchNftsById(address, tokenId);
           if (nfts) {
             setNFT(nfts);
             console.log('NFTs fetched:', nfts); // Debugging
@@ -130,15 +141,14 @@ const NFTDetailComponent: React.FC = () => {
         }
       }
     };
-  
+
     fetchNFTDetails();
-  }, [router.isReady, id, address]);
+  }, [router.isReady, tokenId, address]);
 
   if (isLoading) {
     return <FullPageLoading />;
   }
 
-  
   const handleSubmit = () => {
     console.log('NFT data in handleSubmit:', nft); // Debugging
     if (nft) {
@@ -147,7 +157,6 @@ const NFTDetailComponent: React.FC = () => {
       console.error('NFT is not set properly in handleSubmit');
     }
   };
-  
 
   if (!nft) {
     return <div>NFT not found</div>;
@@ -155,19 +164,21 @@ const NFTDetailComponent: React.FC = () => {
   return (
     <>
       <NextSeo
-        title={`NFTSW - ${nft.name}`}
+        title={`NFTSwapper - ${nft.name}`}
         description={`Details for NFT: ${nft.name}`}
       />
       <div className="container mx-auto px-4 py-8">
         <h1 className="mb-6 text-4xl font-extrabold text-gray-900">
           {nft.name}
         </h1>
+        <h1 className="mb-6 text-4xl font-extrabold text-gray-900">{nft.id}</h1>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div className="flex justify-center">
             <img
               src={`https://ipfs.io/ipfs/${nft.img}`}
               alt={nft.name}
-              className="w-full max-w-md transform rounded-lg shadow-2xl transition-transform hover:scale-105"/>
+              className="w-full max-w-md transform rounded-lg shadow-2xl transition-transform hover:scale-105"
+            />
           </div>
           <div className="flex flex-col justify-between">
             <div>
@@ -177,7 +188,7 @@ const NFTDetailComponent: React.FC = () => {
               <p className="mb-3 text-xl font-semibold text-blue-600">
                 <span className="font-bold">Token ID:</span>
                 <span className="ml-2 rounded bg-gray-200 px-2 py-1">
-                  {nft.id}
+                  {nft.tokenId}
                 </span>
               </p>
               <p className="mb-4 text-lg italic text-gray-700">
@@ -219,7 +230,7 @@ const NFTDetailComponent: React.FC = () => {
         </div>
       </div>
       <OffersTab
-        currentUser={user_address}
+        currentUser={user}
         orderWithOffers={demoOrderWithOffers}
         getNFtById={fetchNftsById}
       />
@@ -323,7 +334,9 @@ const OffersTab = ({ currentUser, orderWithOffers, getNFtById }) => {
                               className="mr-3 h-16 w-16 rounded"
                             />
                             <div>
-                              <h3 className="text-lg font-medium">{nft.name}</h3>
+                              <h3 className="text-lg font-medium">
+                                {nft.name}
+                              </h3>
                               <p className="text-sm text-gray-500">
                                 Collection:
                                 <a
@@ -346,9 +359,7 @@ const OffersTab = ({ currentUser, orderWithOffers, getNFtById }) => {
                     </div>
                   </td>
                   <td className="py-3 px-6">
-                    {offer.nftOffered.some(
-                      (nftId) => nftDetails[offer.offeredIds.find(id => id === nftId)]?.owner === currentUser
-                    ) ? (
+                    {orderWithOffers.order?.owner === currentUser ? (
                       <button
                         className="rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition-colors duration-300 hover:bg-blue-700"
                         onClick={() => handleAcceptOffer(offer.nftOffered)}

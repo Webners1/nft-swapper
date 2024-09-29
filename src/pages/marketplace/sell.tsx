@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import { NextSeo } from 'next-seo';
 import Card from '@/components/ui/card';
 import { NextPageWithLayout, NFTDataType } from '@/types';
-import demoData from '../../data/demo.json';
 import MarketPlaceLayout from '@/layouts/maketplace/layout';
 import { useEvmContractNFTs } from '@moralisweb3/next';
 import { ERC721TOKEN_ADDRESS } from '@/lib/constants/web3_contants';
@@ -13,10 +12,10 @@ const MarketPlaceSell: NextPageWithLayout = () => {
     chain: '0x5',
     address: ERC721TOKEN_ADDRESS,
   };
-  const { UserNfts } = useContext(WalletContext);
+  const { UserNfts, userListedNfts } = useContext(WalletContext);
   const [items] = useState<Array<NFTDataType>>(UserNfts);
   const [saleItems] = useState<Array<NFTDataType>>(
-    UserNfts?.slice(0, 3) 
+    userListedNfts
   );
   const [floorPrice] = useState<number>(20);
   const [totalTrade] = useState<number>(210022);
@@ -24,8 +23,8 @@ const MarketPlaceSell: NextPageWithLayout = () => {
   return (
     <>
       <NextSeo
-        title="NFTSW - Marketplace"
-        description="NFTSW - Marketplace Sell"
+        title="NFTSwapper - Marketplace"
+        description="NFTSwapper - Marketplace Sell"
       />
       <section className="flex items-center gap-x-12 border-b-2 border-gray-300 py-10">
         <div className="flex flex-col gap-y-1">

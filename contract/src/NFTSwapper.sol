@@ -15,6 +15,7 @@ contract NFTSwapper is ReentrancyGuard {
 
     // Struct to represent an offer made on an order
     struct Offer {
+        uint256 offerId;
         address proposer;       // Address of the offer maker
         address[] nftOffered;   // Contract addresses of the NFTs offered
         uint256[] offeredIds;   // Token IDs of the offered NFTs
@@ -27,7 +28,6 @@ contract NFTSwapper is ReentrancyGuard {
     
     // Global counters
     uint256 public orderCounter;
-    uint256 public offerCounter;
 
     // Events
     event OrderCreated(uint256 indexed orderId, address indexed owner, address nftAddress, uint256 nftId);
@@ -59,37 +59,49 @@ contract NFTSwapper is ReentrancyGuard {
     }
 
     // Function to make an offer on an order with multiple NFTs (each NFT can have different contract addresses)
-    function makeOffer(
-        uint256 _orderId, 
-        address[] calldata _nftOffered, 
-        uint256[] calldata _offeredIds
-    ) external nonReentrant returns(uint256) {
-        // Validate offer and ensure the order is active
-        require(orders[_orderId].isActive, "Order is not active");
-        require(_nftOffered.length > 0 && _nftOffered.length == _offeredIds.length, "Invalid offer data");
+ function makeOffer(
+    uint256 _orderId, 
+    address[] calldata _nftOffered, 
+    uint256[] calldata _offeredIds
+) external nonReentrant  {
+    // Cache the order in memory to avoid repeated storage access
+    Order storage order = orders[_orderId];
+    require(order.isActive, "Order is not active");
 
-        // Ensure the contract is approved to transfer the NFTs for each offered contract/token
-        for (uint256 i = 0; i < _nftOffered.length; i++) {
-            require(
-                IERC721(_nftOffered[i]).isApprovedForAll(msg.sender, address(this)) || 
-                IERC721(_nftOffered[i]).getApproved(_offeredIds[i]) == address(this), 
-                "Contract not approved for NFT"
-            );
+    // Ensure the length of NFT addresses and IDs are the same and non-zero
+    uint256 nftCount = _nftOffered.length;
+    require(nftCount > 0 && nftCount == _offeredIds.length, "Invalid offer data");
+
+    // Ensure the contract is approved for transferring NFTs
+    for (uint256 i = 0; i < nftCount; ) {
+        IERC721 nftContract = IERC721(_nftOffered[i]);
+        require(
+            nftContract.isApprovedForAll(msg.sender, address(this)) || 
+            nftContract.getApproved(_offeredIds[i]) == address(this), 
+            "Contract not approved for NFT"
+        );
+        unchecked {
+            i++; // Using unchecked block to avoid gas overhead of safe increment
         }
-
-        // Increment offer counter for unique offer IDs
-        orderOfferCount[_orderId]++; 
-        
-        // Store the offer in the mapping
-        offers[offerCounter] = Offer({
-            proposer: msg.sender,
-            nftOffered: _nftOffered,
-            offeredIds: _offeredIds
-        });
-
-        emit OfferMade(_orderId, offerCounter, msg.sender, _nftOffered, _offeredIds);
-        return offerCounter;
     }
+
+    // Cache the order's offer count to avoid multiple storage reads
+    uint256 currentOfferCount = ++orderOfferCount[_orderId]; // Pre-increment saves gas
+
+    // Store the offer using minimal writes
+    offers[currentOfferCount] = Offer({
+        offerId: currentOfferCount,
+        proposer: msg.sender,
+        nftOffered: _nftOffered,
+        offeredIds: _offeredIds
+    });
+
+    // Emit the OfferMade event
+    emit OfferMade(_orderId, currentOfferCount, msg.sender, _nftOffered, _offeredIds);
+
+    return currentOfferCount;
+}
+
 
     // Function to accept an offer and perform the NFT transfer swap securely
     function acceptOffer(uint256 _orderId, uint256 _offerId) external nonReentrant onlyOrderOwner(_orderId) {

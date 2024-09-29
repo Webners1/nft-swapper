@@ -51,6 +51,7 @@ export const Header = () => {
       <div className="mx-auto flex w-full max-w-[1120px] items-center justify-between">
         <div className="flex items-center">
           <Logo />
+          <h3 style={{ fontWeight: '700' }}> NFTSwapper</h3>
         </div>
         <div className="flex items-center">
           <div className="flex items-center">

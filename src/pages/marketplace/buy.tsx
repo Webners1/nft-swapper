@@ -75,7 +75,7 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
         // Check if the order is active
         if (isActive) {
           // Store the active order in the array
-          const nftDetail = await fetchNftsById(nftAddress, nftId);
+          const nftDetail = await fetchNftsById(nftAddress, nftId, i);
           nftDetails.push(nftDetail); // Add the NFT detail to the array
         }
       }
@@ -138,12 +138,15 @@ const MarketPlaceBuy: NextPageWithLayout = () => {
   return (
     <>
       <NextSeo
-        title="NFTSW - Marketplace"
-        description="NFTSW Marketplace Buy"
+        title="NFTSwapper - Marketplace"
+        description="NFTSwapper Marketplace Buy"
       />
       <div className={`my-10 grid custom-grid-cols-${numPerRow} gap-4 py-10`}>
         {items?.map((nft, index) => (
-          <Link href={`/marketplace/${nft.address}/${nft.id}`} passHref>
+          <Link
+            href={`/marketplace/${nft.address}/${nft.tokenId}/${nft.id}`}
+            passHref
+          >
             <a>
               <React.Fragment key={`${nft.name}_${index}`}>
                 <Card

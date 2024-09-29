@@ -3,6 +3,7 @@ import Image from '@/components/ui/image';
 import AnchorLink from '@/components/ui/links/anchor-link';
 import routes from '@/config/routes';
 import { LAYOUT_OPTIONS } from '@/lib/constants';
+import image from '../../assets/images/nftswapper-logo.png'
 
 export const Logo = () => {
   const router = useRouter();
@@ -24,7 +25,13 @@ export const Logo = () => {
     >
       <span className="relative flex overflow-hidden">
         {/* FIXING:  */}
-        {/* <Image src={} alt="Criptic" priority /> */}
+        <Image
+          src={image}
+          alt="NftSwapper"
+          priority
+          height="100px"
+          width="100px"
+        />
       </span>
     </AnchorLink>
   );

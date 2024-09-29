@@ -5,7 +5,7 @@ import MinimalLayout from '@/layouts/_minimal';
 const ICOPage: NextPageWithLayout = () => {
   return (
     <>
-      <NextSeo title="ICO" description="NFTSW - ICO Boilerplate" />
+      <NextSeo title="ICO" description="NFTSwapper - ICO Boilerplate" />
       <ICO />
     </>
   );

@@ -1,6 +1,6 @@
 const routes = {
   home: '/',
-  marketplace: '/marketplace/[address]/[id]',
+  marketplace: '/marketplace',
   sell: '/marketplace/sell/',
   buy: '/marketplace/buy/',
 };
