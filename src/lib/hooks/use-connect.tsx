@@ -4,10 +4,11 @@ import { ethers } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { NFTDataType } from '@/types';
 import { useContext } from 'react';
+// import {NFTSwappetABI} from "path"
 
 const web3modalStorageKey = 'WEB3_CONNECT_CACHED_PROVIDER';
 let nftSwapperContract: ethers.Contract | null = null; 
-export const WalletContext = createContext<any>({});
+// export const WalletContext = createContext<any>({});
 const apiKey = '68JvmwmnZk2qDYdyPENtpGPh'; // Replace with your actual API key
 
 interface WalletContextType {
@@ -260,6 +261,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }
     checkConnection().then();
   }, []);
+
+      const NFTSwapperAddress = "0xxxx";
+
 
   const setWalletAddress = async (provider: Web3Provider) => {
     try {
