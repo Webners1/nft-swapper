@@ -14,6 +14,7 @@ import Button from '@/components/ui/button';
 import BidValue from '@/components/bid-value';
 
 interface Offer {
+  offerId: number;
   proposer: string; // Address of the offer maker
   nftOffered: string[]; // Contract addresses of the NFTs offered
   offeredIds: number[]; // Token IDs of the offered NFTs
@@ -35,7 +36,7 @@ const useOrderWithOffers = (orderId: number) => {
   const [orderWithOffers, setOrderWithOffers] =
     useState<OrderWithOffers | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [getOrder, getOffers] = useContext(WalletContext);
+  const { getOrder, getOffers } = useContext(WalletContext);
   const [error, setError] = useState<string | null>(null);
 
   // Memoized fetch function
@@ -56,7 +57,7 @@ const useOrderWithOffers = (orderId: number) => {
     } finally {
       setLoading(false);
     }
-  }, [orderId]);
+  }, [orderId, getOrder, getOffers]);
 
   // Fetch data when the component mounts or when orderId changes
   useEffect(() => {
@@ -73,38 +74,40 @@ const NFTDetailComponent: React.FC = () => {
   const { orderWithOffers, loading, error } = useOrderWithOffers(id);
   const demoOrderWithOffers: OrderWithOffers = {
     order: {
-      owner: user, // Address of the order creator (the NFT contract)
+      owner: user, // Address of the order creator (example user)
       nftAddress: '0x303963f2480d9995e5596658986dd2a0af9a28e5', // NFT contract address
       nftId: 1, // Sample NFT token ID
       isActive: true, // Status of the order
     },
     offers: [
       {
+        offerId: 1,
         proposer: '0xa1b2c3d4e5f67890abcdef1234567890abcdef12', // Address of the offer maker
         nftOffered: ['0x303963f2480d9995e5596658986dd2a0af9a28e5'], // Contract address of the NFT offered
         offeredIds: [1077], // Token IDs of the offered NFTs
       },
       {
+        offerId: 2,
         proposer: '0xb1c2d3e4f5g67890abcdef1234567890abcdef34', // Another offer maker's address
         nftOffered: [
           '0x303963f2480d9995e5596658986dd2a0af9a28e5',
           '0x303963f2480d9995e5596658986dd2a0af9a28e5',
           '0x303963f2480d9995e5596658986dd2a0af9a28e5',
           '0x303963f2480d9995e5596658986dd2a0af9a28e5',
-        ], // Contract address of the NFT offered
+        ], // Contract addresses of the NFTs offered
         offeredIds: [2058, 1300, 1034, 1034], // Token IDs of the offered NFTs
       },
       {
+        offerId: 3,
         proposer: '0xc1d2e3f4g5h67890abcdef1234567890abcdef56', // Yet another offer maker's address
         nftOffered: [
           '0x303963f2480d9995e5596658986dd2a0af9a28e5',
           '0x303963f2480d9995e5596658986dd2a0af9a28e5',
-        ], // Contract address of the NFT offered
+        ], // Contract addresses of the NFTs offered
         offeredIds: [1470, 1350], // Token IDs of the offered NFTs
       },
     ],
   };
-
   const [nft, setNFT] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -200,22 +203,64 @@ const NFTDetailComponent: React.FC = () => {
             <div className="flex flex-col gap-4">
               <h2 className="text-2xl font-bold text-gray-800">Properties</h2>
               <div className="rounded-lg bg-white p-5 shadow-lg">
-                {nft.properties?.map((property, pIdx) => (
-                  <div
-                    className="mb-3 flex items-center rounded-lg bg-gray-50 p-4 shadow transition-shadow duration-300 hover:shadow-md"
-                    key={`${pIdx}_${property.attribute_name}`}
-                  >
-                    <span className="w-1/3 font-medium text-gray-800">
-                      {property.attribute_name}
-                    </span>
-                    <span className="w-1/3 text-gray-600">
-                      {property.attribute_value}
-                    </span>
-                    <span className="w-1/3 text-gray-500">
-                      {property.percentage}
-                    </span>
-                  </div>
-                ))}
+                {nft.properties?.map(
+                  (
+                    property: {
+                      attribute_name:
+                        | string
+                        | number
+                        | boolean
+                        | React.ReactElement<
+                            any,
+                            string | React.JSXElementConstructor<any>
+                          >
+                        | React.ReactFragment
+                        | React.ReactPortal
+                        | null
+                        | undefined;
+                      attribute_value:
+                        | string
+                        | number
+                        | boolean
+                        | React.ReactElement<
+                            any,
+                            string | React.JSXElementConstructor<any>
+                          >
+                        | React.ReactFragment
+                        | React.ReactPortal
+                        | null
+                        | undefined;
+                      percentage:
+                        | string
+                        | number
+                        | boolean
+                        | React.ReactElement<
+                            any,
+                            string | React.JSXElementConstructor<any>
+                          >
+                        | React.ReactFragment
+                        | React.ReactPortal
+                        | null
+                        | undefined;
+                    },
+                    pIdx: any
+                  ) => (
+                    <div
+                      className="mb-3 flex items-center rounded-lg bg-gray-50 p-4 shadow transition-shadow duration-300 hover:shadow-md"
+                      key={`${pIdx}_${property.attribute_name}`}
+                    >
+                      <span className="w-1/3 font-medium text-gray-800">
+                        {property.attribute_name}
+                      </span>
+                      <span className="w-1/3 text-gray-600">
+                        {property.attribute_value}
+                      </span>
+                      <span className="w-1/3 text-gray-500">
+                        {property.percentage}
+                      </span>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -238,7 +283,17 @@ const NFTDetailComponent: React.FC = () => {
   );
 };
 
-NFTDetailComponent.getLayout = function getLayout(page) {
+NFTDetailComponent.getLayout = function getLayout(
+  page:
+    | string
+    | number
+    | boolean
+    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+    | React.ReactFragment
+    | React.ReactPortal
+    | null
+    | undefined
+) {
   return <MarketPlaceLayout>{page}</MarketPlaceLayout>;
 };
 
@@ -264,17 +319,22 @@ const OffersTab = ({ currentUser, orderWithOffers, getNFtById }) => {
       try {
         const details = {};
         await Promise.all(
-          offers.map(async (offer) => {
-            // Fetch NFT details for each NFT offered
-            const nftFetchPromises = offer.nftOffered.map(
-              async (nftAddress, index) => {
-                const offerId = offer.offeredIds[index]; // Get corresponding offer ID
-                const nftDetail = await getNFtById(nftAddress, offerId); // Fetch NFT by address and ID
-                details[offerId] = nftDetail; // Store the NFT detail by ID
-              }
-            );
-            await Promise.all(nftFetchPromises); // Wait for all NFT fetch promises to resolve
-          })
+          offers.map(
+            async (offer: {
+              nftOffered: any[];
+              offeredIds: { [x: string]: any };
+            }) => {
+              // Fetch NFT details for each NFT offered
+              const nftFetchPromises = offer.nftOffered.map(
+                async (nftAddress: any, index: string | number) => {
+                  const offerId = offer.offeredIds[index]; // Get corresponding offer ID
+                  const nftDetail = await getNFtById(nftAddress, offerId); // Fetch NFT by address and ID
+                  details[offerId] = nftDetail; // Store the NFT detail by ID
+                }
+              );
+              await Promise.all(nftFetchPromises); // Wait for all NFT fetch promises to resolve
+            }
+          )
         );
         setNftDetails(details); // Update NFT details state
       } catch (error) {
@@ -313,65 +373,93 @@ const OffersTab = ({ currentUser, orderWithOffers, getNFtById }) => {
               </tr>
             </thead>
             <tbody>
-              {offers.map((offer, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-200 transition duration-300 hover:bg-gray-50"
-                >
-                  <td className="py-3 px-6 font-semibold">{offer.proposer}</td>
-                  <td className="py-3 px-6">
-                    <div className="flex flex-wrap gap-4">
-                      {offer.nftOffered.map((nftId, nftIndex) => {
-                        const nft = nftDetails[offer.offeredIds[nftIndex]]; // Get the NFT detail by ID
-                        return nft ? ( // Check if the NFT data is available
-                          <div
-                            key={nftIndex}
-                            className="flex items-center rounded-lg bg-gray-100 p-4 shadow-md transition-transform hover:scale-105"
-                          >
-                            <img
-                              src={`https://ipfs.io/ipfs/${nft.img}`} // Ensure the correct image URL is used
-                              alt={`NFT ${nftId}`} // Use the ID for alt text
-                              className="mr-3 h-16 w-16 rounded"
-                            />
-                            <div>
-                              <h3 className="text-lg font-medium">
-                                {nft.name}
-                              </h3>
-                              <p className="text-sm text-gray-500">
-                                Collection:
-                                <a
-                                  href={`https://www.zkmarkets.com/scroll-mainnet/collections/${nft.address}/nfts/${nftId}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:underline"
-                                >
-                                  {nft.address}
-                                </a>
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          <div key={nftIndex} className="flex items-center">
-                            <p className="text-gray-500">Loading NFT...</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </td>
-                  <td className="py-3 px-6">
-                    {orderWithOffers.order?.owner === currentUser ? (
-                      <button
-                        className="rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition-colors duration-300 hover:bg-blue-700"
-                        onClick={() => handleAcceptOffer(offer.nftOffered)}
-                      >
-                        Accept Offer
-                      </button>
-                    ) : (
-                      <span className="text-gray-500">Not Your NFT</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {offers.map(
+                (
+                  offer: {
+                    proposer:
+                      | string
+                      | number
+                      | boolean
+                      | React.ReactElement<
+                          any,
+                          string | React.JSXElementConstructor<any>
+                        >
+                      | React.ReactFragment
+                      | React.ReactPortal
+                      | null
+                      | undefined;
+                    nftOffered: any[];
+                    offeredIds: { [x: string]: string | number };
+                    offerId: any;
+                  },
+                  index: React.Key | null | undefined
+                ) => (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-200 transition duration-300 hover:bg-gray-50"
+                  >
+                    <td className="py-3 px-6 font-semibold">
+                      {offer.proposer}
+                    </td>
+                    <td className="py-3 px-6">
+                      <div className="flex flex-wrap gap-4">
+                        {offer.nftOffered.map(
+                          (
+                            nftId: any,
+                            nftIndex: React.Key | null | undefined
+                          ) => {
+                            const nft = nftDetails[offer.offeredIds[nftIndex]]; // Get the NFT detail by ID
+                            return nft ? ( // Check if the NFT data is available
+                              <div
+                                key={nftIndex}
+                                className="flex items-center rounded-lg bg-gray-100 p-4 shadow-md transition-transform hover:scale-105"
+                              >
+                                <img
+                                  src={`https://ipfs.io/ipfs/${nft.img}`} // Ensure the correct image URL is used
+                                  alt={`NFT ${nftId}`} // Use the ID for alt text
+                                  className="mr-3 h-16 w-16 rounded"
+                                />
+                                <div>
+                                  <h3 className="text-lg font-medium">
+                                    {nft.name}
+                                  </h3>
+                                  <p className="text-sm text-gray-500">
+                                    Collection:
+                                    <a
+                                      href={`https://www.zkmarkets.com/scroll-mainnet/collections/${nft.address}/nfts/${nftId}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline"
+                                    >
+                                      {nft.address}
+                                    </a>
+                                  </p>
+                                </div>
+                              </div>
+                            ) : (
+                              <div key={nftIndex} className="flex items-center">
+                                <p className="text-gray-500">Loading NFT...</p>
+                              </div>
+                            );
+                          }
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-6">
+                      {orderWithOffers.order?.owner === currentUser ? (
+                        <button
+                          className="rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition-colors duration-300 hover:bg-blue-700"
+                          onClick={() => handleAcceptOffer(offer.offerId)}
+                        >
+                          Accept Offer
+                        </button>
+                      ) : (
+                        <span className="text-gray-500">Not Your NFT</span>
+                      )}
+                    </td>
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         </div>
@@ -381,7 +469,7 @@ const OffersTab = ({ currentUser, orderWithOffers, getNFtById }) => {
 };
 
 // Mock function to handle accepting an offer
-const handleAcceptOffer = (nftId) => {
+const handleAcceptOffer = (offerId: any) => {
   // Implement your accept offer logic here
-  console.log(`Offer accepted for NFT ID: ${nftId}`);
+  console.log(`Offer accepted for Offer ID: ${offerId}`);
 };

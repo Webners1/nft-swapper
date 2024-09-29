@@ -17,11 +17,11 @@ interface WalletContextType {
   loading: boolean;
   apiKey: string;
   error: boolean;
-  getOffers: (orderId: number) => Promise<void>;
+  getOffers: (orderId: number) => Promise<any>;
   getAllOrder: () => Promise<void>;
   getAllOrders: () => Promise<void>;
   userListedNfts: NFTDataType[] | NFTDataType | undefined;
-  getOrder: (orderId: number) => Promise<void>;
+  getOrder: (orderId: number) => Promise<Order>;
   connectToWallet: () => Promise<void>;
   disconnectWallet: () => void;
   getProvider: () => ethers.providers.Web3Provider | undefined;
@@ -228,23 +228,6 @@ export const cancelOrder = async (orderId: number) => {
   }
 };
 
-export const getOffers = async (orderId: number) => {
-  const { nftSwapperContract } = useWallet();
-  try {
-    if (!nftSwapperContract) {
-      throw new Error(
-        'Contract not initialized. Make sure the wallet is connected.'
-      );
-    }
-
-    const offers = await nftSwapperContract.getOffers(orderId);
-    return offers;
-  } catch (error) {
-    console.error('Error getting offers:', error);
-    throw error;
-  }
-};
-
 export const getAllOrder = async () => {
   const { nftSwapperContract } = useWallet();
   try {
@@ -258,45 +241,6 @@ export const getAllOrder = async () => {
     return offers;
   } catch (error) {
     console.error('Error getting offers:', error);
-    throw error;
-  }
-};
-
-export const getOrder = async (orderId: number) => {
-  const { nftSwapperContract } = useWallet();
-  try {
-    if (!nftSwapperContract) {
-      throw new Error(
-        'Contract not initialized. Make sure the wallet is connected.'
-      );
-    }
-
-    const offers = await nftSwapperContract.getOrderDetails(orderId);
-    return offers;
-  } catch (error) {
-    console.error('Error getting offers:', error);
-    throw error;
-  }
-};
-
-export const getOrderDetails = async (orderId: number) => {
-  const { nftSwapperContract } = useWallet();
-  try {
-    if (!nftSwapperContract) {
-      throw new Error(
-        'Contract not initialized. Make sure the wallet is connected.'
-      );
-    }
-
-    const order = await nftSwapperContract.orders(orderId);
-    return {
-      owner: order.owner,
-      nftAddress: order.nftAddress,
-      nftId: order.nftId.toString(),
-      isActive: order.isActive,
-    };
-  } catch (error) {
-    console.error('Error getting order details:', error);
     throw error;
   }
 };
@@ -339,6 +283,38 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }
     checkConnection().then();
   }, [ActiveNftDetails]);
+
+  const getOffers = async (orderId: number) => {
+    
+    try {
+      if (!nftSwapperContract) {
+        throw new Error(
+          'Contract not initialized. Make sure the wallet is connected.'
+        );
+      }
+
+      const offers = await nftSwapperContract.getOffers(orderId);
+      return offers;
+    } catch (error) {
+      console.error('Error getting offers:', error);
+      throw error;
+    }
+  };
+
+  const getOrder = async (orderId: number): Promise<Order>  => {
+    try {
+      if (!nftSwapperContract) {
+        throw new Error(
+          'Contract not initialized. Make sure the wallet is connected.'
+        );
+      }
+
+      const offers = await nftSwapperContract.getOrderDetails(orderId);
+      return offers;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getAllOrders = async () => {
     try {
@@ -577,11 +553,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         connectToWallet,
         disconnectWallet,
         getProvider,
+        getOrder,
         getOffers,
         getAllOrder,
         userListedNfts,
         getAllOrders,
-        getOrder,
         getSigner,
         nftSwapperContract,
       }}
