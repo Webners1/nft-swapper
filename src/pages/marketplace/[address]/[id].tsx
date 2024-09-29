@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { NextSeo } from 'next-seo';
 import { NFTDataType } from '@/types';
@@ -12,11 +12,90 @@ import MarketPlaceLayout from '@/layouts/maketplace/layout';
 import { useModal } from '@/components/modal-views/context';
 import Button from '@/components/ui/button';
 
+interface Offer {
+  proposer: string; // Address of the offer maker
+  nftOffered: string[]; // Contract addresses of the NFTs offered
+  offeredIds: number[]; // Token IDs of the offered NFTs
+}
+
+interface Order {
+  owner: string; // Address of the order creator
+  nftAddress: string; // Contract address of the NFT listed
+  nftId: number; // Token ID of the NFT listed
+  isActive: boolean; // Status of the order (active or not)
+}
+
+interface OrderWithOffers {
+  order: Order;
+  offers: Offer[];
+}
+
+const useOrderWithOffers = (orderId: number) => {
+  const [orderWithOffers, setOrderWithOffers] =
+    useState<OrderWithOffers | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [getOrder, getOffers] = useContext(WalletContext);
+  const [error, setError] = useState<string | null>(null);
+
+  // Memoized fetch function
+  const fetchOrderAndOffers = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Assuming getOrder and getOffers are available functions from your file
+      const order: Order = await getOrder(orderId);
+      const offers: Offer[] = await getOffers(orderId);
+
+      // Set the combined result in state
+      setOrderWithOffers({ order, offers });
+    } catch (error) {
+      console.error('Error fetching order and offers:', error);
+      setError('Failed to fetch order and offers');
+    } finally {
+      setLoading(false);
+    }
+  }, [orderId]);
+
+  // Fetch data when the component mounts or when orderId changes
+  useEffect(() => {
+    fetchOrderAndOffers();
+  }, [fetchOrderAndOffers]);
+
+  return { orderWithOffers, loading, error };
+};
 const NFTDetailComponent: React.FC = () => {
   const router = useRouter();
   const { openModal, data } = useModal();
 
   const { address, id } = router.query;
+  const { orderWithOffers, loading, error } = useOrderWithOffers(id);
+  const demoOrderWithOffers: OrderWithOffers = {
+    order: {
+      owner: '0x303963f2480d9995e5596658986dd2a0af9a28e5', // Address of the order creator (the NFT contract)
+      nftAddress: '0x303963f2480d9995e5596658986dd2a0af9a28e5', // NFT contract address
+      nftId: 1, // Sample NFT token ID
+      isActive: true, // Status of the order
+    },
+    offers: [
+      {
+        proposer: '0xa1b2c3d4e5f67890abcdef1234567890abcdef12', // Address of the offer maker
+        nftOffered: ['0x303963f2480d9995e5596658986dd2a0af9a28e5'], // Contract address of the NFT offered
+        offeredIds: [1077], // Token IDs of the offered NFTs
+      },
+      {
+        proposer: '0xb1c2d3e4f5g67890abcdef1234567890abcdef34', // Another offer maker's address
+        nftOffered: ['0x303963f2480d9995e5596658986dd2a0af9a28e5','0x303963f2480d9995e5596658986dd2a0af9a28e5','0x303963f2480d9995e5596658986dd2a0af9a28e5','0x303963f2480d9995e5596658986dd2a0af9a28e5'], // Contract address of the NFT offered
+        offeredIds: [2058,1300,1034,1034], // Token IDs of the offered NFTs
+      },
+      {
+        proposer: '0xc1d2e3f4g5h67890abcdef1234567890abcdef56', // Yet another offer maker's address
+        nftOffered: ['0x303963f2480d9995e5596658986dd2a0af9a28e5','0x303963f2480d9995e5596658986dd2a0af9a28e5'], // Contract address of the NFT offered
+        offeredIds: [1470,1350], // Token IDs of the offered NFTs
+      },
+    ],
+  };
+
   const [nft, setNFT] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const user_address = '0x76151eb2cc64df8f51550b5341ddcedf4be8676a';
@@ -133,7 +212,11 @@ const NFTDetailComponent: React.FC = () => {
           </Button>
         </div>
       </div>
-      <OffersTab currentUser={user_address} />
+      <OffersTab
+        currentUser={user_address}
+        orderWithOffers={demoOrderWithOffers}
+        getNFtById={fetchNftsById}
+      />
     </>
   );
 };
@@ -147,139 +230,135 @@ export interface OfferType {
   offerMaker: string;
   nfts: NFTDataType[];
 }
-const OffersTab = ({ currentUser }) => {
-  // Define the OfferType interface to represent an offer with multiple NFTs
+const OffersTab = ({ currentUser, orderWithOffers, getNFtById }) => {
+  // Extract offers from the fetched data
+  const { offers } = orderWithOffers;
 
-  // Sample demo offers
-  const demoOffers: OfferType[] = [
-    {
-      offerMaker: '0xOfferMakerAddress1',
-      nfts: [
-        {
-          id: 1,
-          img: 'QmUo4Bc5kKrHT4HTs3h9hfK2MB8jcK4sD5aDh61w9FFmKK', // Example IPFS hash for image
-          address: '0x1234567890abcdef1234567890abcdef12345678',
-          name: 'Cool Cat #1',
-          owner: '0xOwnerAddress1',
-        },
-      ],
-    },
-    {
-      offerMaker: '0xOfferMakerAddress2',
-      nfts: [
-        {
-          id: 2,
-          img: 'QmUo4Bc5kKrHT4HTs3h9hfK2MB8jcK4sD5aDh61w9FFmKK',
-          address: '0x1234567890abcdef1234567890abcdef12345679',
-          name: 'Crypto Punks #2',
-          owner: '0xOwnerAddress2',
-        },
-        {
-          id: 3,
-          img: 'QmUo4Bc5kKrHT4HTs3h9hfK2MB8jcK4sD5aDh61w9FFmKK',
-          address: '0x1234567890abcdef1234567890abcdef12345680',
-          name: 'Bored Ape #3',
-          owner: '0xOwnerAddress1',
-        },
-      ],
-    },
-    {
-      offerMaker: '0xOfferMakerAddress3',
-      nfts: [
-        {
-          id: 4,
-          img: 'QmUo4Bc5kKrHT4HTs3h9hfK2MB8jcK4sD5aDh61w9FFmKK',
-          address: '0x1234567890abcdef1234567890abcdef12345681',
-          name: 'Art Blocks #4',
-          owner: '0xOwnerAddress3',
-        },
-        {
-          id: 5,
-          img: 'QmUo4Bc5kKrHT4HTs3h9hfK2MB8jcK4sD5aDh61w9FFmKK',
-          address: '0x1234567890abcdef1234567890abcdef12345682',
-          name: 'Art Blocks #5',
-          owner: '0xOwnerAddress1',
-        },
-        {
-          id: 6,
-          img: 'QmUo4Bc5kKrHT4HTs3h9hfK2MB8jcK4sD5aDh61w9FFmKK',
-          address: '0x1234567890abcdef1234567890abcdef12345683',
-          name: 'Art Blocks #6',
-          owner: '0xOwnerAddress2',
-        },
-      ],
-    },
-  ];
+  // State to hold fetched NFT details and loading/error states
+  const [nftDetails, setNftDetails] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchNFTDetails = async () => {
+      setLoading(true); // Set loading state to true
+      setError(null); // Reset error state
+
+      try {
+        const details = {};
+        await Promise.all(
+          offers.map(async (offer) => {
+            // Fetch NFT details for each NFT offered
+            const nftFetchPromises = offer.nftOffered.map(
+              async (nftAddress, index) => {
+                const offerId = offer.offeredIds[index]; // Get corresponding offer ID
+                const nftDetail = await getNFtById(nftAddress, offerId); // Fetch NFT by address and ID
+                details[offerId] = nftDetail; // Store the NFT detail by ID
+              }
+            );
+            await Promise.all(nftFetchPromises); // Wait for all NFT fetch promises to resolve
+          })
+        );
+        setNftDetails(details); // Update NFT details state
+      } catch (error) {
+        setError('Error fetching NFT details.'); // Set error message if an error occurs
+        console.error('Error fetching NFT details:', error);
+      } finally {
+        setLoading(false); // Set loading state to false
+      }
+    };
+
+    if (offers.length > 0) {
+      fetchNFTDetails(); // Fetch details only if there are offers
+    }
+  }, [offers]);
+
+  if (loading) return <div>Loading...</div>; // Display loading message
+  if (error) return <div>{error}</div>; // Display error message
+
   return (
     <>
       <h1 className="mb-8 text-center text-4xl font-extrabold text-gray-900">
         NFT Offers
       </h1>
-      <div className="overflow-x-auto">
-        <table className="min-w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
-          <thead>
-            <tr className="bg-gray-200 text-gray-600">
-              <th className="py-4 px-6 text-left">Offer Maker</th>
-              <th className="py-4 px-6 text-left">NFTs</th>
-              <th className="py-4 px-6 text-left">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {demoOffers.map((offer, index) => (
-              <tr
-                key={index}
-                className="border-b border-gray-200 transition duration-300 hover:bg-gray-50"
-              >
-                <td className="py-3 px-6 font-semibold">{offer.offerMaker}</td>
-                <td className="py-3 px-6">
-                  <div className="flex flex-wrap gap-4">
-                    {offer.nfts.map((nft) => (
-                      <div
-                        key={nft.id}
-                        className="flex items-center rounded-lg bg-gray-100 p-4 shadow-md transition-transform hover:scale-105"
-                      >
-                        <img
-                          src={`https://ipfs.io/ipfs/${nft.img}`}
-                          alt={nft.name}
-                          className="mr-3 h-16 w-16 rounded"
-                        />
-                        <div>
-                          <h3 className="text-lg font-medium">{nft.name}</h3>
-                          <p className="text-sm text-gray-500">
-                            Collection:
-                            <a
-                              href={`https://www.zkmarkets.com/scroll-mainnet/collections${nft.address}/nfts/${nft.id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              {nft.address}
-                            </a>
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </td>
-                <td className="py-3 px-6">
-                  {offer.nfts.some((nft) => nft.owner === currentUser) ? (
-                    <button
-                      className="rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition-colors duration-300 hover:bg-blue-700"
-                      onClick={() =>
-                        handleAcceptOffer(offer.nfts.map((nft) => nft.id))
-                      }
-                    >
-                      Accept Offer
-                    </button>
-                  ) : (
-                    <span className="text-gray-500">Not Your NFT</span>
-                  )}
-                </td>
+      {loading ? ( // Show loading state
+        <div className="text-center">Loading NFT details...</div>
+      ) : error ? ( // Show error message if there was an error
+        <div className="text-center text-red-500">{error}</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full rounded-lg border border-gray-200 bg-white shadow-lg">
+            <thead>
+              <tr className="bg-gray-200 text-gray-600">
+                <th className="py-4 px-6 text-left">Offer Maker</th>
+                <th className="py-4 px-6 text-left">NFTs</th>
+                <th className="py-4 px-6 text-left">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {offers.map((offer, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-gray-200 transition duration-300 hover:bg-gray-50"
+                >
+                  <td className="py-3 px-6 font-semibold">{offer.proposer}</td>
+                  <td className="py-3 px-6">
+                    <div className="flex flex-wrap gap-4">
+                      {offer.nftOffered.map((nftId, nftIndex) => {
+                        const nft = nftDetails[offer.offeredIds[nftIndex]]; // Get the NFT detail by ID
+                        return nft ? ( // Check if the NFT data is available
+                          <div
+                            key={nftIndex}
+                            className="flex items-center rounded-lg bg-gray-100 p-4 shadow-md transition-transform hover:scale-105"
+                          >
+                            <img
+                              src={`https://ipfs.io/ipfs/${nft.img}`} // Ensure the correct image URL is used
+                              alt={`NFT ${nftId}`} // Use the ID for alt text
+                              className="mr-3 h-16 w-16 rounded"
+                            />
+                            <div>
+                              <h3 className="text-lg font-medium">{nft.name}</h3>
+                              <p className="text-sm text-gray-500">
+                                Collection:
+                                <a
+                                  href={`https://www.zkmarkets.com/scroll-mainnet/collections/${nft.address}/nfts/${nftId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  {nft.address}
+                                </a>
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div key={nftIndex} className="flex items-center">
+                            <p className="text-gray-500">Loading NFT...</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </td>
+                  <td className="py-3 px-6">
+                    {offer.nftOffered.some(
+                      (nftId) => nftDetails[offer.offeredIds.find(id => id === nftId)]?.owner === currentUser
+                    ) ? (
+                      <button
+                        className="rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition-colors duration-300 hover:bg-blue-700"
+                        onClick={() => handleAcceptOffer(offer.nftOffered)}
+                      >
+                        Accept Offer
+                      </button>
+                    ) : (
+                      <span className="text-gray-500">Not Your NFT</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </>
   );
 };

@@ -134,6 +134,14 @@ contract NFTSwapper is ReentrancyGuard {
         revert("Direct payments not accepted");
     }
 
+    function getOrder() external view returns (uint256){
+        return orderCounter;
+    }
+
+    function getOrderDetails(uint256 id)external view returns (Order memory){
+        return orders[id];
+    }
+
    function getOffers(uint256 _orderId) external view returns (Offer[] memory) {
     // Retrieve the total number of offers for the order
     uint256 totalOffers = orderOfferCount[_orderId];
