@@ -168,7 +168,7 @@ export const createOrder = async (nftAddress: string, nftId: string) => {
 
 export const makeOffer = async (
   orderId: number,
-  nftOffered: string,
+  nftOffered: string[],
   offeredIds: number[]
 ) => {
   const { nftSwapperContract } = useWallet();

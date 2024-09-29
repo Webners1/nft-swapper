@@ -6,7 +6,7 @@ import Input from '../ui/forms/input';
 import { FC, useContext, useState } from 'react';
 import { NFTDataType } from '@/types';
 import Multiselect from 'multiselect-react-dropdown';
-import { WalletContext } from '@/lib/hooks/use-connect';
+import { makeOffer, WalletContext } from '@/lib/hooks/use-connect';
 
 type NFT_STATUS = 'ON_SALE' | 'READY_FOR_SALE';
 interface BidValueViewProps {
@@ -25,19 +25,25 @@ const BidValue: FC<BidValueViewProps> = () => {
   const handleMakeOrder = async () => {
     setIsLoading(true);
     setError(null);
+  
     try {
+      // Prepare arrays to hold the NFT addresses and offered IDs
+      const offeredIds = [];
+      const nftAddresses = [];
+  
+      // Iterate through selected NFTs to collect addresses and IDs
       for (const nft of selectedNfts) {
-        // Assuming you have the orderId and offeredIds prepared
-        const orderId = nft.orderId; // Placeholder, replace this with actual logic for orderId
-        const offeredIds = [nft.id]; // If you're offering just one NFT at a time
-
-        // Call makeOffer function
-        await makeOffer(data?.id, nft.address, offeredIds);
+        offeredIds.push(nft.tokenId); // Add tokenId of the NFT
+        nftAddresses.push(nft.address); // Add address of the NFT
       }
-      console.log('All orders created successfully');
+  
+      // Call makeOffer function with all NFT addresses and offered IDs
+      await makeOffer(data?.id, nftAddresses, offeredIds);
+  
+      console.log('Offer created successfully');
       closeModal();
     } catch (error) {
-      console.error('Error creating orders:', error);
+      console.error('Error creating order:', error);
       setError('Failed to create order. Please try again.');
     } finally {
       setIsLoading(false);
