@@ -20,43 +20,46 @@ const BidValue: FC<BidValueViewProps> = () => {
   const { UserNfts } = useContext(WalletContext);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  console.log(data)
 
   const handleMakeOrder = async () => {
-        setIsLoading(true);
-        setError(null);
-      
-        try {
-          for (const nft of selectedNfts) {
-            // Assuming you have the orderId and offeredIds prepared
-            const orderId = nft.orderId; // Placeholder, replace this with actual logic for orderId
-            const offeredIds = [nft.id]; // If you're offering just one NFT at a time
-      
-            // Call makeOffer function
-            await makeOffer(orderId, nft.address, offeredIds);
-          }
-          console.log("All orders created successfully");
-          closeModal();
-        } catch (error) {
-          console.error("Error creating orders:", error);
-          setError("Failed to create order. Please try again.");
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      
-  
-  const headerTxt = 'Bid Price';
-  const btnTxt = 'Place Bid';
-  const handleSelect = (selectedList: NFTDataType[], selectedItem: NFTDataType) => {
-    setSelectedNfts(selectedList);
- console.log({selectedNfts})
+    setIsLoading(true);
+    setError(null);
+    try {
+      for (const nft of selectedNfts) {
+        // Assuming you have the orderId and offeredIds prepared
+        const orderId = nft.orderId; // Placeholder, replace this with actual logic for orderId
+        const offeredIds = [nft.id]; // If you're offering just one NFT at a time
 
+        // Call makeOffer function
+        await makeOffer(data?.id, nft.address, offeredIds);
+      }
+      console.log('All orders created successfully');
+      closeModal();
+    } catch (error) {
+      console.error('Error creating orders:', error);
+      setError('Failed to create order. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRemove = (selectedList: NFTDataType[], selectedItem: NFTDataType) => {
+  const headerTxt = 'Bid Price';
+  const btnTxt = 'Place Bid';
+  const handleSelect = (
+    selectedList: NFTDataType[],
+    selectedItem: NFTDataType
+  ) => {
     setSelectedNfts(selectedList);
- console.log({selectedNfts})
+    console.log({ selectedNfts });
+  };
 
+  const handleRemove = (
+    selectedList: NFTDataType[],
+    selectedItem: NFTDataType
+  ) => {
+    setSelectedNfts(selectedList);
+    console.log({ selectedNfts });
   };
 
   return (
@@ -87,13 +90,11 @@ const BidValue: FC<BidValueViewProps> = () => {
         <br />
 
         <div className="flex space-x-4">
-    <Button onClick={handleMakeOrder} disabled={isLoading}>
-        {isLoading ? 'Placing Bid...' : 'Place Bid'}
-    </Button>
-    <Button onClick={closeModal}>Cancel</Button>
-</div>
-
-
+          <Button onClick={handleMakeOrder} disabled={isLoading}>
+            {isLoading ? 'Placing Bid...' : 'Place Bid'}
+          </Button>
+          <Button onClick={closeModal}>Cancel</Button>
+        </div>
       </div>
     </>
   );
