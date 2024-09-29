@@ -11,6 +11,7 @@ import FullPageLoading from '@/components/ui/loading/full-page-loading';
 import MarketPlaceLayout from '@/layouts/maketplace/layout';
 import { useModal } from '@/components/modal-views/context';
 import Button from '@/components/ui/button';
+import BidValue from '@/components/bid-value';
 
 interface Offer {
   proposer: string; // Address of the offer maker
@@ -107,25 +108,20 @@ const NFTDetailComponent: React.FC = () => {
     }
   }, [router.isReady]);
 
-  let btnText = 'Make an Offer';
+  const btnText = 'Make an Offer';
 
-  const handleSubmit = () => {
-    console.log('Opening BID_VALUE modal'); // Debug line
-    openModal('BID_VALUE', nft);
-  };
 
   useEffect(() => {
     const fetchNFTDetails = async () => {
       if (router.isReady && id && address) {
-        // Ensure router is ready and id is available
-        console.log('Fetching for ID:', id); // Debugging
         try {
+          console.log('Fetching NFT with ID:', id, ' and Address:', address); // Debugging
           const nfts = await fetchNftsById(address, id);
           if (nfts) {
             setNFT(nfts);
-            console.log({ nfts });
+            console.log('NFTs fetched:', nfts); // Debugging
           } else {
-            console.error('NFT not found');
+            console.error('No NFT data returned from fetchNftsById');
           }
         } catch (error) {
           console.error('Error fetching NFT details:', error);
@@ -134,13 +130,24 @@ const NFTDetailComponent: React.FC = () => {
         }
       }
     };
-
+  
     fetchNFTDetails();
-  }, [router.isReady, id]);
+  }, [router.isReady, id, address]);
 
   if (isLoading) {
     return <FullPageLoading />;
   }
+
+  
+  const handleSubmit = () => {
+    console.log('NFT data in handleSubmit:', nft); // Debugging
+    if (nft) {
+      openModal('BID_VALUE', { nft });
+    } else {
+      console.error('NFT is not set properly in handleSubmit');
+    }
+  };
+  
 
   if (!nft) {
     return <div>NFT not found</div>;
@@ -160,8 +167,7 @@ const NFTDetailComponent: React.FC = () => {
             <img
               src={`https://ipfs.io/ipfs/${nft.img}`}
               alt={nft.name}
-              className="w-full max-w-md transform rounded-lg shadow-2xl transition-transform hover:scale-105"
-            />
+              className="w-full max-w-md transform rounded-lg shadow-2xl transition-transform hover:scale-105"/>
           </div>
           <div className="flex flex-col justify-between">
             <div>
