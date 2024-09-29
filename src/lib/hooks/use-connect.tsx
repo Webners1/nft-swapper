@@ -3,13 +3,38 @@ import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { NFTDataType } from '@/types';
+import { useContext } from 'react';
 
 const web3modalStorageKey = 'WEB3_CONNECT_CACHED_PROVIDER';
-
+let nftSwapperContract: ethers.Contract | null = null; 
 export const WalletContext = createContext<any>({});
 const apiKey = '68JvmwmnZk2qDYdyPENtpGPh'; // Replace with your actual API key
 
-// Move these functions outside of WalletProvider
+interface WalletContextType {
+  address: string | undefined;
+  balance: string | undefined;
+  UserNfts: NFTDataType[] | NFTDataType | undefined;
+  loading: boolean;
+  apiKey: string;
+  error: boolean;
+  connectToWallet: () => Promise<void>;
+  disconnectWallet: () => void;
+  getProvider: () => ethers.providers.Web3Provider | undefined;
+  getSigner: () => ethers.Signer | undefined;
+  nftSwapperContract: ethers.Contract | null;
+}
+
+export const WalletContext = createContext<WalletContextType | undefined>(undefined);
+
+export const useWallet = () => {
+  const context = useContext(WalletContext);
+  if (context === undefined) {
+    throw new Error('useWallet must be used within a WalletProvider');
+  }
+  return context;
+};
+
+
 export const fetchNftsByOwner = async (
   address: string,
   apiKey: string
@@ -42,6 +67,8 @@ export const fetchNftsByOwner = async (
         address: asset.contract_address || null,
       };
     });
+
+
 
     // Console log the description and owner for each NFT
 
@@ -106,17 +133,116 @@ export const fetchNFTData = async (address: string, apiKey: string) => {
   }
 };
 
+export const createOrder = async (nftAddress: string, nftId: string) => {
+  const { nftSwapperContract } = useWallet();
+  try {
+    if (!nftSwapperContract) {
+      throw new Error("Contract not initialized. Make sure the wallet is connected.");
+    }
+    const tx = await nftSwapperContract.createOrder(nftAddress, nftId);
+    await tx.wait();
+    console.log("Order created successfully. Transaction hash:", tx.hash);
+    return tx.hash;
+  } catch (error) {
+    console.error("Error creating order:", error);
+    throw error;
+  }
+};
+
+export const makeOffer = async (orderId: number, nftOffered: string, offeredIds: number[]) => {
+  const { nftSwapperContract } = useWallet();
+  try {
+    if (!nftSwapperContract) {
+      throw new Error("Contract not initialized. Make sure the wallet is connected.");
+    }
+
+    const tx = await nftSwapperContract.makeOffer(orderId, nftOffered, offeredIds);
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    console.error("Error making offer:", error);
+    throw error;
+  }
+};
+
+export const acceptOffer = async (orderId: number, offerId: number) => {
+  const { nftSwapperContract } = useWallet();
+  try {
+    if (!nftSwapperContract) {
+      throw new Error("Contract not initialized. Make sure the wallet is connected.");
+    }
+
+    const tx = await nftSwapperContract.acceptOffer(orderId, offerId);
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    console.error("Error accepting offer:", error);
+    throw error;
+  }
+};
+
+export const cancelOrder = async (orderId: number) => {
+  const { nftSwapperContract } = useWallet();
+  try {
+    if (!nftSwapperContract) {
+      throw new Error("Contract not initialized. Make sure the wallet is connected.");
+    }
+
+    const tx = await nftSwapperContract.cancelOrder(orderId);
+    await tx.wait();
+    return tx.hash;
+  } catch (error) {
+    console.error("Error canceling order:", error);
+    throw error;
+  }
+};
+
+export const getOffers = async (orderId: number) => {
+  const { nftSwapperContract } = useWallet();
+  try {
+    if (!nftSwapperContract) {
+      throw new Error("Contract not initialized. Make sure the wallet is connected.");
+    }
+
+    const offers = await nftSwapperContract.getOffers(orderId);
+    return offers;
+  } catch (error) {
+    console.error("Error getting offers:", error);
+    throw error;
+  }
+};
+
+export const getOrderDetails = async (orderId: number) => {
+  const { nftSwapperContract } = useWallet();
+  try {
+    if (!nftSwapperContract) {
+      throw new Error("Contract not initialized. Make sure the wallet is connected.");
+    }
+
+    const order = await nftSwapperContract.orders(orderId);
+    return {
+      owner: order.owner,
+      nftAddress: order.nftAddress,
+      nftId: order.nftId.toString(),
+      isActive: order.isActive
+    };
+  } catch (error) {
+    console.error("Error getting order details:", error);
+    throw error;
+  }
+};
+
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
+
+
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [balance, setBalance] = useState<string | undefined>(undefined);
-
-  const [UserNfts, setUserNfts] = useState<
-    NFTDataType[] | NFTDataType | undefined
-  >(undefined);
+  const [UserNfts, setUserNfts] = useState<NFTDataType[] | NFTDataType | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-  const web3Modal =
-    typeof window !== 'undefined' && new Web3Modal({ cacheProvider: true });
+  const [nftSwapperContract, setNftSwapperContract] = useState<ethers.Contract | null>(null);
+
+  const web3Modal = typeof window !== 'undefined' && new Web3Modal({ cacheProvider: true });
 
   useEffect(() => {
     async function checkConnection() {
@@ -141,25 +267,25 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       if (signer) {
         const web3Address = await signer.getAddress();
         setAddress(web3Address);
-        await getBalance(provider, web3Address); // Ensure getBalance finishes
+        await getBalance(provider, web3Address);
+
+        const newNftSwapperContract = new ethers.Contract(NFTSwapperAddress, NFTSwapperABI, signer);
+        setNftSwapperContract(newNftSwapperContract);
 
         if (web3Address) {
-          const fetchedNfts = await fetchNftsByOwner(
-            '0x76151eb2cc64df8f51550b5341ddcedf4be8676a', // Your test address
-            apiKey
-          );
-          setUserNfts(fetchedNfts); // Update UserNfts
-          console.log('NFTs fetched:', fetchedNfts);
+          const fetchedNfts = await fetchNftsByOwner(web3Address, apiKey);
+          setUserNfts(fetchedNfts);
         }
       }
     } catch (error) {
       console.log('Error in setWalletAddress:', error);
     }
   };
-
   const getSigner = () => {
     if (address === undefined) return undefined;
     const provider = getProvider();
+      console.log('Signer:', signer); // Log the signer to inspect
+
     return provider?.getSigner();
   };
 
@@ -225,6 +351,12 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+
+  
+
+
+
+
   return (
     <WalletContext.Provider
       value={{
@@ -238,6 +370,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         disconnectWallet,
         getProvider,
         getSigner,
+        nftSwapperContract
       }}
     >
       {children}
