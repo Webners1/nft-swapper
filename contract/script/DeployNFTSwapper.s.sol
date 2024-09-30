@@ -6,7 +6,7 @@ import {NFTSwapper} from "../src/NFTSwapper.sol";
 
 contract DeployNFTSwapper is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        uint256 deployerPrivateKey = 0xa204996d053cf1e9abb3bd6001158a91e736c3fce1ab278765f676fce0c07f23;
 
         // Start broadcasting transactions
         vm.startBroadcast(deployerPrivateKey);

@@ -2,5 +2,11 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+rpc_url = "https://scroll-sepolia.g.alchemy.com/v2/Jz-BSrictOj9uU5eTH1EBC6Eqc8SPhiV"
+verifiers = ["etherscan"] 
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"
+]
+etherscan_api_key="AIDE69V47TXUQ8Y7URGH3HDK1DVFQB4HID"
+# See more config options 
+# https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
