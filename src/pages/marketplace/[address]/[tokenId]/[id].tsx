@@ -4,6 +4,7 @@ import { NextSeo } from 'next-seo';
 import { NFTDataType } from '@/types';
 import {
   fetchNftsById,
+  acceptOffer,
   fetchNftsByOwner,
   WalletContext,
 } from '@/lib/hooks/use-connect';
@@ -449,7 +450,7 @@ const OffersTab = ({ currentUser, orderWithOffers, getNFtById }) => {
                       {orderWithOffers.order?.owner === currentUser ? (
                         <button
                           className="rounded-lg bg-blue-600 px-4 py-2 text-white shadow transition-colors duration-300 hover:bg-blue-700"
-                          onClick={() => handleAcceptOffer(offer.offerId)}
+                          onClick={() => handleAcceptOffer(offer.offerId,offer.orderId)}
                         >
                           Accept Offer
                         </button>
@@ -469,7 +470,14 @@ const OffersTab = ({ currentUser, orderWithOffers, getNFtById }) => {
 };
 
 // Mock function to handle accepting an offer
-const handleAcceptOffer = (offerId: any) => {
-  // Implement your accept offer logic here
-  console.log(`Offer accepted for Offer ID: ${offerId}`);
+const handleAcceptOffer = async (orderId: number, offerId: number) => {
+  console.log(`Offer accepted for Order ID: ${orderId}, Offer ID: ${offerId}`);
+
+  try {
+    // Call the acceptOffer function and wait for the transaction hash
+    const txHash = await acceptOffer(orderId, offerId);
+    console.log(`Transaction successful with hash: ${txHash}`);
+  } catch (error) {
+    console.error('Error while accepting offer:', error);
+  }
 };

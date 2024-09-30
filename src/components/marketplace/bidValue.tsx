@@ -5,7 +5,7 @@ import Button from '../ui/button/button';
 import InputLabel from '../ui/input-label';
 import Input from '../ui/forms/input';
 import { NFTDataType } from '@/types';
-import { WalletContext, createOrder } from '@/lib/hooks/use-connect';
+import { WalletContext, makeOffer } from '@/lib/hooks/use-connect';
 
 interface BidValueProps {
   nft?: NFTDataType;
@@ -13,7 +13,6 @@ interface BidValueProps {
 
 const BidValue: FC<BidValueProps> = ({ nft }) => {
   const { closeModal } = useModal();
-
   const [bidAmount, setBidAmount] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,24 +20,29 @@ const BidValue: FC<BidValueProps> = ({ nft }) => {
   // Log the nft data for debugging
   console.log('BidValue NFT:', nft); // Debugging
 
-  const handleBid = async () => {
-    if (!bidAmount) {
-      setError('Please enter a bid amount');
-      return;
-    }
+  const handleMakeOrder = async () => {
     setIsLoading(true);
+    setError(null);
+  
     try {
-      // Call your function to create an order
-      await createOrder(nft, bidAmount);
-      // Handle successful bid (e.g., show a success message)
+      for (const nft of selectedNfts) {
+        // Assuming you have the orderId and offeredIds prepared
+        const orderId = nft.orderId; // Placeholder, replace this with actual logic for orderId
+        const offeredIds = [nft.id]; // If you're offering just one NFT at a time
+  
+        // Call makeOffer function
+        await makeOffer(orderId, nft.address, offeredIds);
+      }
+      console.log("All orders created successfully");
       closeModal();
-    } catch (err) {
-      setError('Failed to place bid');
-      console.error(err);
+    } catch (error) {
+      console.error("Error creating orders:", error);
+      setError("Failed to create order. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div>
@@ -51,7 +55,7 @@ const BidValue: FC<BidValueProps> = ({ nft }) => {
         onChange={(e) => setBidAmount(e.target.value)}
       />
       {error && <p className="text-red-500">{error}</p>}
-      <Button onClick={handleBid} disabled={isLoading}>
+      <Button onClick={handleMakeOrder} disabled={isLoading}>
         {isLoading ? 'Placing Bid...' : 'Place Bid'}
       </Button>
       <Button onClick={closeModal}>Cancel</Button>
