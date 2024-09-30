@@ -1,7 +1,7 @@
 import { Close } from '../icons/close';
 import { useModal } from '../modal-views/context';
 import Button from '../ui/button/button';
-import { FC, useContext, useState } from 'react';
+import { FC, useCallback, useContext, useState } from 'react';
 import { NFTDataType } from '@/types';
 import { WalletContext } from '@/lib/hooks/use-connect';
 
@@ -12,7 +12,7 @@ interface ChangePriceViewProps {
 
 const ChangePriceView: FC<ChangePriceViewProps> = ({ nftStatus }) => {
   const { closeModal, data } = useModal();
-  const [card, setCard] = useState<NFTDataType>(data);
+  const [card] = useState<NFTDataType>(data);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { createOrder } = useContext(WalletContext);
@@ -22,7 +22,7 @@ const ChangePriceView: FC<ChangePriceViewProps> = ({ nftStatus }) => {
   const btnTxt = nftStatus === 'READY_FOR_SALE' ? 'Approve' : 'Default Button';
 
   // Function to handle the order creation
-  const handleCreateOrder = async () => {
+  const handleCreateOrder = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -37,37 +37,34 @@ const ChangePriceView: FC<ChangePriceViewProps> = ({ nftStatus }) => {
     }
   };
   return (
-    <>
-      <div className="flex min-w-[360px] flex-col rounded-xl bg-white p-8">
-        <div className="mb-7 flex items-center justify-between">
-          <h3>{headerTxt}</h3>
-          <Button
-            color="white"
-            variant="ghost"
-            shape="circle"
-            onClick={closeModal}
-          >
-            <Close className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <h5>{`See What Others Have to Offer! 🔥💎`}</h5>
-
-        {/* Show error if it exists */}
-        {error && <p className="text-red-500">{error}</p>}
-
+    <div className="flex min-w-[360px] flex-col rounded-xl bg-white p-8">
+      <div className="mb-7 flex items-center justify-between">
+        <h3>{headerTxt}</h3>
         <Button
-          className="mt-4"
-          variant="solid"
-          size="block"
-          shape="rounded"
-          onClick={handleCreateOrder}
-          disabled={isLoading}
+          color="white"
+          variant="ghost"
+          shape="circle"
+          onClick={closeModal}
         >
-          {isLoading ? 'Processing...' : btnTxt}
+          <Close className="h-4 w-4" />
         </Button>
       </div>
-    </>
+
+      <h5>{`See What Others Have to Offer! 🔥💎`}</h5>
+
+      {error && <p className="text-red-500">{error}</p>}
+
+      <Button
+        className="mt-4"
+        variant="solid"
+        size="block"
+        shape="rounded"
+        onClick={handleCreateOrder}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Processing...' : btnTxt}
+      </Button>
+    </div>
   );
 };
 
