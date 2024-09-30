@@ -63,7 +63,7 @@ contract NFTSwapper is ReentrancyGuard {
     uint256 _orderId, 
     address[] calldata _nftOffered, 
     uint256[] calldata _offeredIds
-) external nonReentrant  {
+) external nonReentrant  returns(uint256){
     // Cache the order in memory to avoid repeated storage access
     Order storage order = orders[_orderId];
     require(order.isActive, "Order is not active");
@@ -154,19 +154,8 @@ contract NFTSwapper is ReentrancyGuard {
         return orders[id];
     }
 
-   function getOffers(uint256 _orderId) external view returns (Offer[] memory) {
-    // Retrieve the total number of offers for the order
-    uint256 totalOffers = orderOfferCount[_orderId];
-
-    // Allocate memory for the return array of Offer structs
-    Offer[] memory offersArray = new Offer[](totalOffers);
-
-    // Populate the array with all offers for the given order
-    for (uint256 i = 0; i < totalOffers; i++) { // Start from 0
-        offersArray[i] = offers[i + 1]; // Copy the offer struct directly
-    }
-
-    return offersArray; // Return the array of Offer structs
+  function getOffers(uint256 offerid) external view returns (Offer memory) {
+    return offers[offerid]; // Return the Offer struct
 }
 
 }

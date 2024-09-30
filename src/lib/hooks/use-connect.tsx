@@ -178,7 +178,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       );
       setNftSwapperContract(newNftSwapperContract);
       const offers = await newNftSwapperContract.offers(orderId);
-      return [offers];
+      return offers;
     } catch (error) {
       console.error('Error getting offers:', error);
       throw error;
