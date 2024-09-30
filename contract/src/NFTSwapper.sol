@@ -162,8 +162,8 @@ contract NFTSwapper is ReentrancyGuard {
     Offer[] memory offersArray = new Offer[](totalOffers);
 
     // Populate the array with all offers for the given order
-    for (uint256 i = 1; i <= totalOffers; i++) {
-        offersArray[i] = offers[i]; // Copy the offer struct directly
+    for (uint256 i = 0; i < totalOffers; i++) { // Start from 0
+        offersArray[i] = offers[i + 1]; // Copy the offer struct directly
     }
 
     return offersArray; // Return the array of Offer structs

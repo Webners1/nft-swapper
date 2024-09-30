@@ -17,7 +17,7 @@ import NFTABI from '../../abi/nft.json';
 const web3modalStorageKey = 'WEB3_CONNECT_CACHED_PROVIDER';
 // export const WalletContext = createContext<any>({});
 const apiKey = '68JvmwmnZk2qDYdyPENtpGPh'; // Replace with your actual API key
-const NFTSwapperAddress = '0xf6dFb80b35FE6e7E8a376E6Ab93f089b3ae48271';
+const NFTSwapperAddress = '0x2e8941e75Fa5a3C4f97D007cEc0520A18fd1B922';
 const ALCHEMY_RPC_URL =
   'https://scroll-sepolia.g.alchemy.com/v2/Jz-BSrictOj9uU5eTH1EBC6Eqc8SPhiV'; // Replace with your actual Alchemy Scroll URL
 const SCROLL_CHAIN_ID = 534351;
@@ -59,6 +59,7 @@ const convertIpfsToHttp = (ipfsUri: string): string => {
 };
 
 interface NFTDetails {
+  id?: number;
   tokenId: number;
   img: string;
   name: string;
@@ -96,47 +97,6 @@ type Order = {
 };
 
 // Function to get all active orders
-
-export const fetchNftsById = async (
-  contract_address: string,
-  tokenId: number,
-  id: number
-): Promise<any | undefined> => {
-  const url = `https://scrollapi.nftscan.com/api/v2/assets/${contract_address}/${tokenId}?show_attribute=true`;
-
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'X-API-KEY': apiKey,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error fetching NFTs: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    // Transforming the data into the NFTDataType format
-    const asset = data.data;
-    console.log({ asset });
-    return {
-      tokenId: parseInt(asset.token_id, 10),
-      id: id,
-      img: asset.image_uri || asset.token_uri,
-      name: asset.name || 'Unnamed NFT',
-      description: asset.description || 'No description available',
-      owner: asset.owner || null,
-      address: asset.contract_address || null,
-      properties: asset.attributes,
-    };
-
-    // Console log the description and owner for each NFT
-  } catch (error) {
-    console.error('Error:', error);
-    throw error; // Re-throw the error so it can be caught by the caller
-  }
-};
 
 export const fetchNFTData = async (address: string, apiKey: string) => {
   try {
@@ -206,14 +166,19 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   }, [address, nft_array]);
   const getOffers = async (orderId: number) => {
     try {
-      if (!nftSwapperContract) {
-        throw new Error(
-          'Contract not initialized. Make sure the wallet is connected.'
-        );
-      }
+      const web3Provider = getWeb3Provider();
 
-      const offers = await nftSwapperContract.getOffers(orderId);
-      return offers;
+      // Check if we're connected to Scroll
+
+      const signer = web3Provider.getSigner();
+      const newNftSwapperContract = new ethers.Contract(
+        NFTSwapperAddress,
+        NFTSwapperABI,
+        signer
+      );
+      setNftSwapperContract(newNftSwapperContract);
+      const offers = await newNftSwapperContract.offers(orderId);
+      return [offers];
     } catch (error) {
       console.error('Error getting offers:', error);
       throw error;
@@ -222,13 +187,19 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   const getOrder = async (orderId: number): Promise<Order> => {
     try {
-      if (!nftSwapperContract) {
-        throw new Error(
-          'Contract not initialized. Make sure the wallet is connected.'
-        );
-      }
+      const web3Provider = getWeb3Provider();
 
-      const offers = await nftSwapperContract.getOrderDetails(orderId);
+      // Check if we're connected to Scroll
+
+      const signer = web3Provider.getSigner();
+
+      const newNftSwapperContract = new ethers.Contract(
+        NFTSwapperAddress,
+        NFTSwapperABI,
+        signer
+      );
+      setNftSwapperContract(newNftSwapperContract);
+      const offers = await newNftSwapperContract.getOrderDetails(orderId);
       return offers;
     } catch (error) {
       console.log(error);
@@ -242,16 +213,16 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           'Contract not initialized. Make sure the wallet is connected.'
         );
       }
-  
+
       // Use Web3Provider instead of JsonRpcProvider to get the signer
       const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = web3Provider.getSigner(); // Signer is required to send transactions
-  
+
       // Get the NFT contract instance with the signer
       const nftContract = new ethers.Contract(nftAddress, NFTABI, signer);
-  
+
       console.log(nftContract);
-  
+
       // Check if the nftSwapperContract is approved to transfer the NFT
       const ownerAddress = await signer.getAddress();
       console.log(ownerAddress);
@@ -260,9 +231,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       const name = await nftContract.name(); // Single token approval check
       console.log(ownerAddress);
       console.log(name);
-     
+
       const approvedAddress = await nftContract.getApproved(nftId); // Single token approval check
-  
+
       if (approvedAddress !== nftSwapperContract.address) {
         // If not approved, call the approve function
         const approvalTx = await nftContract.approve(
@@ -275,7 +246,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           approvalTx.hash
         );
       }
-  
+
       // Now create the order
       const tx = await nftSwapperContract.createOrder(nftAddress, nftId);
       await tx.wait();
@@ -286,10 +257,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   };
-  
-  
-
-  
 
   const makeOffer = async (
     orderId: number,
@@ -303,19 +270,60 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         );
       }
 
+      // Use Web3Provider instead of JsonRpcProvider to get the signer
+      const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = web3Provider.getSigner(); // Signer is required to send transactions
+
+      // Iterate through the NFTs offered
+      for (let i = 0; i < nftOffered.length; i++) {
+        const nftContractAddress = nftOffered[i];
+        const tokenId = offeredIds[i];
+
+        // Initialize the NFT contract
+        const nftContract = new ethers.Contract(
+          nftContractAddress,
+          NFTABI,
+          signer
+        );
+
+        // Check if the NFT is approved for the swapper contract
+        const isApproved = await nftContract.getApproved(tokenId);
+
+        if (isApproved !== nftSwapperContract.address) {
+          console.log(
+            `Approving NFT with tokenId ${tokenId} from contract ${nftContractAddress}`
+          );
+
+          // Approve the NFT for the swapper contract
+          const approvalTx = await nftContract.approve(
+            nftSwapperContract.address,
+            tokenId
+          );
+          await approvalTx.wait();
+
+          console.log(
+            `NFT with tokenId ${tokenId} approved successfully. Transaction hash:`,
+            approvalTx.hash
+          );
+        }
+      }
+
+      // After all NFTs are approved, make the offer
+      console.log(orderId, nftOffered, offeredIds);
       const tx = await nftSwapperContract.makeOffer(
         orderId,
         nftOffered,
         offeredIds
       );
       await tx.wait();
+
+      console.log('Offer made successfully. Transaction hash:', tx.hash);
       return tx.hash;
     } catch (error) {
       console.error('Error making offer:', error);
       throw error;
     }
   };
-
   const acceptOffer = async (orderId: number, offerId: number) => {
     try {
       if (!nftSwapperContract) {
@@ -438,66 +446,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     }
     setUserNfts((UserNfts = nfts));
-  };
-
-  const getAllOrders = async () => {
-    try {
-      // First, get the total number of orders
-      // const totalOrders = await nftSwapperContract.getAllOrder();
-      const totalOrders = 4; // For demo purposes
-      const activeNftDetails = []; // Object to store active orders
-
-      // Iterate through each order ID
-      for (let i = 0; i < totalOrders; i++) {
-        // const orderDetails = await nftSwapperContract.getOrderDetails(i); // Fetch order details
-        const demoOrders = [
-          {
-            owner: '0x1234567890abcdef1234567890abcdef12345678',
-            nftAddress: '0x303963f2480d9995e5596658986dd2a0af9a28e5',
-            nftId: Math.floor(Math.random() * (1450 - 100 + 1)) + 100,
-            isActive: true,
-          },
-          {
-            owner: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-            nftAddress: '0x303963f2480d9995e5596658986dd2a0af9a28e5',
-            nftId: Math.floor(Math.random() * (1450 - 100 + 1)) + 100,
-            isActive: true,
-          },
-          {
-            owner: '0x7890abcdefabcdef1234567890abcdef12345678',
-            nftAddress: '0x303963f2480d9995e5596658986dd2a0af9a28e5',
-            nftId: Math.floor(Math.random() * (1450 - 100 + 1)) + 100,
-            isActive: false,
-          },
-          {
-            owner: '0x56789abcdef1234567890abcdef1234567890abc',
-            nftAddress: '0x303963f2480d9995e5596658986dd2a0af9a28e5',
-            nftId: Math.floor(Math.random() * (1450 - 100 + 1)) + 100,
-            isActive: true,
-          },
-          {
-            owner: '0x34567890abcdefabcdef1234567890abcdef1234',
-            nftAddress: '0x303963f2480d9995e5596658986dd2a0af9a28e5',
-            nftId: Math.floor(Math.random() * (1450 - 100 + 1)) + 100,
-            isActive: false,
-          },
-        ];
-
-        // Destructure the order details
-        const { owner, nftAddress, nftId, isActive } = demoOrders[i]; // Get order details for the current index
-
-        // Check if the order is active
-        if (isActive) {
-          // Store the active order in the object
-          const nftDetail = await fetchNftsById(nftAddress, nftId, i); // Pass the nftId directly
-          activeNftDetails[i] = nftDetail; // Store the NFT detail by order index
-        }
-      }
-
-      setActiveNftDetails(activeNftDetails); // Update state with active orders
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   // const ALCHEMY_RPC_URL =
@@ -626,6 +574,53 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     setBalance(balanceInEth);
   };
 
+  const fetchNftsById = async (
+    contract_address: string,
+    tokenId: number,
+    id: number
+  ): Promise<any | undefined> => {
+    const provider = new ethers.providers.JsonRpcProvider(ALCHEMY_RPC_URL);
+
+    // Memoize the contract initialization
+    const nftContracts = new ethers.Contract(
+      contract_address,
+      NFTABI,
+      provider
+    );
+
+    if (nftContracts.length === 0) return;
+    setLoading(true);
+    setError(null);
+    const nfts = [];
+    const Owner = '';
+    try {
+      console.log(tokenId);
+      const tokenUri = await nftContracts.tokenURI(tokenId);
+      const metadata = await fetchMetadata(tokenUri);
+
+      const Owner = await nftContracts.ownerOf(tokenId);
+
+      if (metadata) {
+        const newNft: NFTDetails = {
+          id: id,
+          tokenId: tokenId,
+          img: metadata.image || convertIpfsToHttp(tokenUri),
+          name: metadata.name || 'Unnamed NFT',
+          description: metadata.description || 'No description available',
+          owner: Owner,
+          address: nftContracts.address,
+        };
+
+        nfts.push(newNft);
+      }
+      console.log('ffff', { nfts });
+      return nfts;
+    } catch (err) {
+      console.error('Error fetching NFTs:', err);
+      setError('Failed to fetch NFTs.');
+    }
+  };
+
   const disconnectWallet = () => {
     setAddress(undefined);
     web3Modal && web3Modal.clearCachedProvider();
@@ -692,10 +687,10 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         makeOffer,
         acceptOffer,
         cancelOrder,
+        fetchNftsById,
         getOffers,
         getAllOrder,
         userListedNfts,
-        getAllOrders,
         getSigner,
         nftSwapperContract,
       }}

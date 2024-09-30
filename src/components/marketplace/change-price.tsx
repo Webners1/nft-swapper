@@ -35,7 +35,7 @@ const ChangePriceView: FC<ChangePriceViewProps> = ({ nftStatus }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  })
   return (
     <div className="flex min-w-[360px] flex-col rounded-xl bg-white p-8">
       <div className="mb-7 flex items-center justify-between">

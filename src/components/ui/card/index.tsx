@@ -42,6 +42,7 @@ const Card: FC<CardProps> = ({ cn, card, cardType = 'BID_VALUE' }) => {
   const showDetail = () => {
     router.push(`/marketplace/${card.address}/${card.tokenId}/${card.id}`);
   };
+  console.log(cn,{card})
   return (
     <>
       <div
@@ -50,7 +51,7 @@ const Card: FC<CardProps> = ({ cn, card, cardType = 'BID_VALUE' }) => {
         <div className="relative w-full">
           <img
             className="rounded-lg bg-gray-100 p-2"
-            src={`https://ipfs.io/ipfs/${card.img}`}
+            src={`${card.img}`}
             alt={card.name}
             onClick={() => showDetail()}
           />

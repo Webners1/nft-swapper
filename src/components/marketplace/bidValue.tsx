@@ -7,6 +7,7 @@ import { FC, useContext, useState } from 'react';
 import { NFTDataType } from '@/types';
 import Multiselect from 'multiselect-react-dropdown';
 import { makeOffer, WalletContext } from '@/lib/hooks/use-connect';
+import { useRouter } from 'next/router';
 
 type NFT_STATUS = 'ON_SALE' | 'READY_FOR_SALE';
 interface BidValueViewProps {
@@ -16,12 +17,14 @@ interface BidValueViewProps {
 const BidValue: FC<BidValueViewProps> = () => {
   const { closeModal, data } = useModal();
   const [card, setCard] = useState<NFTDataType>(data);
+  const router = useRouter()
   const [selectedNfts, setSelectedNfts] = useState<NFTDataType[] | null>();
   const { UserNfts, makeOffer } = useContext(WalletContext);
+  const { id } = router.query;
   
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  console.log(data)
+  console.log({UserNfts})
 
   const handleMakeOrder = async () => {
     setIsLoading(true);
@@ -37,9 +40,8 @@ const BidValue: FC<BidValueViewProps> = () => {
         offeredIds.push(nft.tokenId); // Add tokenId of the NFT
         nftAddresses.push(nft.address); // Add address of the NFT
       }
-  
       // Call makeOffer function with all NFT addresses and offered IDs
-      await makeOffer(data?.id, nftAddresses, offeredIds);
+      await makeOffer(id, nftAddresses, offeredIds);
   
       console.log('Offer created successfully');
       closeModal();
@@ -88,6 +90,7 @@ const BidValue: FC<BidValueViewProps> = () => {
 
         <Multiselect
           displayValue="name"
+          key={"tokenId"}
           onKeyPressFn={function noRefCheck() {}}
           onRemove={handleRemove}
           onSearch={function noRefCheck() {}}
