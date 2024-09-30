@@ -69,7 +69,7 @@ const useOrderWithOffers = (orderId: number) => {
 };
 const NFTDetailComponent: React.FC = () => {
   const router = useRouter();
-  const { openModal, data } = useModal();
+  const { openModal } = useModal();
   const { address: user } = useContext(WalletContext);
   const { address, tokenId, id } = router.query;
   const { orderWithOffers, loading, error } = useOrderWithOffers(id);
@@ -131,7 +131,7 @@ const NFTDetailComponent: React.FC = () => {
             ' and Address:',
             address
           ); // Debugging
-          const nfts = await fetchNftsById(address, tokenId);
+          const nfts = await fetchNftsById(address, tokenId,id);
           if (nfts) {
             setNFT(nfts);
             console.log('NFTs fetched:', nfts); // Debugging

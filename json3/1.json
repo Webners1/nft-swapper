@@ -1,0 +1,23 @@
+{
+    "name": "Art Piece 1",
+    "description": "A mesmerizing digital artwork that explores the themes of light and shadow.",
+    "image": "https://ipfs.io/ipfs/QmUmELVzKNnQLZHdDTXdqgJzpSLUGoufy6o5UAW7WnfXX4",
+    "attributes": [
+      {
+        "trait_type": "Artist",
+        "value": "Artist Name 1"
+      },
+      {
+        "trait_type": "Year",
+        "value": "2024"
+      },
+      {
+        "trait_type": "Medium",
+        "value": "Digital Art"
+      },
+      {
+        "trait_type": "Style",
+        "value": "Abstract"
+      }
+    ]
+  }

@@ -14,12 +14,9 @@ const MarketPlaceSell: NextPageWithLayout = () => {
   };
   const { UserNfts, userListedNfts } = useContext(WalletContext);
   const [items] = useState<Array<NFTDataType>>(UserNfts);
-  const [saleItems] = useState<Array<NFTDataType>>(
-    userListedNfts
-  );
-  const [floorPrice] = useState<number>(20);
-  const [totalTrade] = useState<number>(210022);
-  console.log(UserNfts);
+  const [saleItems] = useState<Array<NFTDataType>>(userListedNfts);
+  const [floorPrice] = useState<number>(0);
+  const [totalTrade] = useState<number>(0);
   return (
     <>
       <NextSeo
@@ -33,7 +30,7 @@ const MarketPlaceSell: NextPageWithLayout = () => {
         </div>
         <div className="flex flex-col gap-y-1">
           <h2>{totalTrade}</h2>
-          <p className="text-gray-400">total trades</p>
+          <p className="text-gray-400">total traded NFT</p>
         </div>
       </section>
       <section className="border-b-2 border-gray-300 pt-7 pb-5">

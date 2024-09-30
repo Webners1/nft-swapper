@@ -17,7 +17,8 @@ const BidValue: FC<BidValueViewProps> = () => {
   const { closeModal, data } = useModal();
   const [card, setCard] = useState<NFTDataType>(data);
   const [selectedNfts, setSelectedNfts] = useState<NFTDataType[] | null>();
-  const { UserNfts } = useContext(WalletContext);
+  const { UserNfts, makeOffer } = useContext(WalletContext);
+  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   console.log(data)
