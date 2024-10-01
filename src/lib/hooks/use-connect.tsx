@@ -148,15 +148,15 @@ export const fetchNFTData = async (address: string, apiKey: string) => {
   }
 };
 
-export const createOrder = async (nftAddress: string, nftId: string) => {
-  const { nftSwapperContract } = useWallet();
+export const createOrder = async (nftAddress: string, nftId: string, nftSwapperContract: ethers.Contract) => {
+  console.log(nftSwapperContract, "CONTRACT");
   try {
     if (!nftSwapperContract) {
-      throw new Error(
-        'Contract not initialized. Make sure the wallet is connected.'
-      );
+      throw new Error('Contract not initialized. Make sure the wallet is connected.');
     }
-    const tx = await nftSwapperContract.createOrder(nftAddress, nftId);
+    // Use checksum address to avoid ENS lookup
+    const checksumAddress = ethers.utils.getAddress(nftAddress);
+    const tx = await nftSwapperContract.createOrder(checksumAddress, nftId);
     await tx.wait();
     console.log('Order created successfully. Transaction hash:', tx.hash);
     return tx.hash;
